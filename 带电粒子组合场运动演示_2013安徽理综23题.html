@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>带电粒子在组合场中的运动 · 2013 安徽理综 23 题</title>
+<style>
+  :root{
+    --ink:#16233a; --muted:#64748b; --line:#e4ebf6;
+    --blue:#2563eb; --blue-d:#1d4ed8; --red:#e11d48;
+    --field:#d97706; --mag:#4f46e5; --vel:#0f766e; --geo:#7c3aed;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(900px 520px at 10% -12%, #e6eefc 0%, rgba(230,238,252,0) 60%),
+      radial-gradient(1000px 620px at 100% 0%, #edefff 0%, rgba(237,239,255,0) 55%),
+      #eef2f8;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  .app{height:100%;display:flex;flex-direction:column;gap:10px;padding:12px 16px 14px}
+  header.top{flex:0 0 auto;display:flex;align-items:center;gap:14px}
+  .tag{font-size:11.5px;font-weight:700;letter-spacing:.4px;color:#1d4ed8;background:#e8efff;
+       border:1px solid #d3e0fd;padding:4px 11px;border-radius:999px;white-space:nowrap}
+  h1{font-size:18px;margin:0 0 2px;font-weight:700;letter-spacing:.4px}
+  .sub{font-size:12px;color:var(--muted)}
+  main{flex:1 1 auto;display:grid;grid-template-columns:minmax(0,1fr) 396px;gap:14px;min-height:0}
+  .stage{position:relative;background:#fff;border-radius:16px;border:1px solid #e6ecf6;
+         box-shadow:0 12px 34px rgba(22,35,58,.09);overflow:hidden;min-height:0}
+  canvas{display:block;width:100%;height:100%}
+  .hud{position:absolute;left:14px;top:12px;display:flex;align-items:center;gap:10px;
+       background:rgba(255,255,255,.86);border:1px solid #e2e9f5;border-radius:999px;
+       padding:5px 12px;backdrop-filter:blur(4px);box-shadow:0 3px 10px rgba(22,35,58,.06)}
+  .hud #hudStage{font-size:12.5px;font-weight:700;color:#1d4ed8}
+  .hud #hudPct{font-size:11.5px;color:#94a3b8;font-variant-numeric:tabular-nums}
+  .hint{position:absolute;left:14px;bottom:11px;font-size:11.5px;color:#94a3b8;letter-spacing:.2px}
+
+  .panel{min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:10px;padding-right:3px}
+  .panel::-webkit-scrollbar{width:7px}
+  .panel::-webkit-scrollbar-thumb{background:#d7e1f0;border-radius:8px}
+  .card{background:#fff;border:1px solid #e6ecf6;border-radius:14px;padding:12px 13px;
+        box-shadow:0 6px 18px rgba(22,35,58,.05)}
+  .card h2{margin:0 0 8px;font-size:13px;font-weight:700;color:#0f172a;letter-spacing:.3px}
+  .row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .btn{border:1px solid #d9e2f0;background:#fff;color:var(--ink);padding:7px 13px;border-radius:10px;
+       font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.16s}
+  .btn:hover{background:#f4f7fc;border-color:#c3d0e4}
+  .btn.primary{background:linear-gradient(180deg,#2f6bf0,#1d4ed8);color:#fff;border-color:#1d4ed8;
+               box-shadow:0 6px 14px rgba(37,99,235,.28);min-width:96px}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .seg{margin-left:auto;display:flex;border:1px solid #d9e2f0;border-radius:9px;overflow:hidden}
+  .seg button{border:0;background:#fff;color:#64748b;font-size:11.5px;font-weight:700;
+              padding:6px 9px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:#eaf1ff;color:#1d4ed8}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:24px;background:transparent;cursor:pointer}
+  input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:5px;background:#e4eaf5}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+        background:#1d4ed8;border:2px solid #fff;box-shadow:0 2px 6px rgba(29,78,216,.45);margin-top:-5px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .chips button{border:1px solid #dbe4f2;background:#fbfcfe;color:#475569;font-size:11.5px;
+                padding:5px 9px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600}
+  .chips button.on{background:#eef4ff;border-color:#b9cffb;color:#1d4ed8}
+
+  .st-body{font-size:12.5px;line-height:1.75;color:#334155}
+  .st-body p{margin:0 0 7px}
+  .st-body b{color:#0f172a}
+  .st-body .tip{color:#7c5a12;background:#fff9ec;border:1px solid #f6e6c4;border-radius:8px;padding:6px 9px;font-size:12px}
+  #stTitle{color:#1d4ed8;font-size:13.5px}
+
+  .qa{border-left:3px solid #dde6f4;background:#fbfcfe;border-radius:9px;padding:8px 10px;margin-bottom:8px;transition:.2s}
+  .qa:last-child{margin-bottom:0}
+  .qa h3{margin:0 0 5px;font-size:12px;font-weight:700;color:#94a3b8;display:flex;align-items:center;gap:6px}
+  .qa h3 .badge{margin-left:auto;font-size:10px;font-weight:700;color:#a8b6cc;border:1px solid #e0e8f4;
+                border-radius:5px;padding:1px 5px}
+  .qa p{margin:2px 0;font-size:12px;line-height:1.7;color:#475569}
+  .qa .res{display:inline-block;font-family:"Cambria Math","Times New Roman",serif;font-size:13.5px;
+           color:#b91c1c;font-weight:700;letter-spacing:.2px}
+  .qa.active{border-left-color:#2563eb;background:#f3f7ff;box-shadow:0 4px 16px rgba(37,99,235,.10)}
+  .qa.active h3{color:#1d4ed8}
+  .qa.active h3 .badge{color:#2563eb;border-color:#c9dbfb}
+
+  .toggles{display:grid;grid-template-columns:1fr 1fr;gap:7px 10px;margin-bottom:10px}
+  .toggles label{display:flex;align-items:center;gap:6px;font-size:12px;color:#334155;cursor:pointer}
+  .toggles input{accent-color:#1d4ed8;width:14px;height:14px}
+  .ratio{display:flex;align-items:center;gap:8px;font-size:11.5px;color:#64748b}
+  .ratio span{white-space:nowrap}
+  .ratio input{flex:1 1 auto}
+  .ratio b{color:#1d4ed8;font-variant-numeric:tabular-nums;width:34px;text-align:right}
+
+  .note{font-size:11.5px;line-height:1.7;color:#64748b;background:#f7f9fd;border:1px dashed #dbe4f2;
+        border-radius:12px;padding:10px 12px}
+  .note b{color:#475569}
+  @media (max-width:1180px){
+    body{overflow:auto}
+    main{grid-template-columns:1fr;grid-template-rows:minmax(420px,58vh) auto}
+    .stage{min-height:420px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <span class="tag">2013 · 安徽卷理综 第 23 题</span>
+    <div>
+      <h1>带电粒子在电场与磁场组合场中的运动</h1>
+      <div class="sub">电场偏转 → 磁场圆周 → 与 y 轴成 45° 出射 · 高三一轮复习投屏演示</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="stage">
+      <canvas id="cv"></canvas>
+      <div class="hud"><span id="hudStage">① 电场偏转</span><span id="hudPct">0%</span></div>
+      <div class="hint">空格：播放 / 暂停　R：重播　← →：逐步</div>
+    </section>
+
+    <aside class="panel">
+      <section class="card">
+        <div class="row">
+          <button id="btnPlay" class="btn primary">▶ 播放</button>
+          <button id="btnReplay" class="btn">↺ 重播</button>
+          <div class="seg" id="segSpeed">
+            <button data-sp="0.5">0.5×</button>
+            <button data-sp="1" class="on">1×</button>
+            <button data-sp="1.6">1.6×</button>
+          </div>
+        </div>
+        <input id="scrub" type="range" min="0" max="1000" value="0">
+        <div class="chips" id="chips">
+          <button data-jump="0" class="on">① 电场偏转</button>
+          <button data-jump="1">② a 点速度</button>
+          <button data-jump="2">③ 磁场圆周</button>
+          <button data-jump="3">④ 45° 出射</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 id="stTitle">① 电场中：类平抛运动（第 1 问）</h2>
+        <div id="stBody" class="st-body"></div>
+      </section>
+
+      <section class="card">
+        <h2>三问解答</h2>
+        <div class="qa" id="qa1">
+          <h3>第 (1) 问 · 电场强度 E<span class="badge">E</span></h3>
+          <p>沿 x 匀速：2h = v₀t ⟹ t = 2h/v₀</p>
+          <p>沿 y 匀加速：h = ½at² ⟹ a = v₀²/(2h)</p>
+          <p>qE = ma ⟹ <span class="res">E = mv₀²/(2qh)</span></p>
+        </div>
+        <div class="qa" id="qa2">
+          <h3>第 (2) 问 · a 点速度<span class="badge">v</span></h3>
+          <p>v_y = at = v₀，v_a = √(v₀² + v_y²)</p>
+          <p>tanθ = v_y / v₀ = 1 ⟹ θ = 45°</p>
+          <p><span class="res">v_a = √2 v₀，与 y 轴负方向成 45°</span></p>
+        </div>
+        <div class="qa" id="qa3">
+          <h3>第 (3) 问 · 磁感应强度最小值<span class="badge">B</span></h3>
+          <p>qv_aB = mv_a²/r ⟹ r = √2mv₀/(qB)</p>
+          <p>速度转过 90°，弦长 = 2r·sin45° = √2r ≤ L</p>
+          <p>r 最大 ⟺ B 最小：<span class="res">B_min = 2mv₀/(qL)</span></p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>显示与作图比例</h2>
+        <div class="toggles">
+          <label><input type="checkbox" id="tTrail" checked> 运动轨迹</label>
+          <label><input type="checkbox" id="tLabel" checked> 文字标注</label>
+          <label><input type="checkbox" id="tGeom" checked> 几何辅助</label>
+          <label><input type="checkbox" id="tGrid"> 坐标网格</label>
+        </div>
+        <div class="ratio">
+          <span>示意比例 L / h</span>
+          <input id="ratio" type="range" min="1.2" max="2.6" step="0.05" value="1.8">
+          <b id="ratioVal">1.80</b>
+        </div>
+      </section>
+
+      <div class="note">
+        <b>作图说明：</b>题中 h、L 均为符号量，图中按 L = <span id="noteRatio">1.80</span>h 的比例示意（可用滑块调整），只为便于观察，不改变任何物理结论；E 与 B 的大小仍以符号表达式给出。<br>
+        <b>细节提示：</b>粒子自 p 向 −y 方向偏转，而场强沿 +y 方向，故电场力与场强反向 —— 粒子带负电。
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var cv = document.getElementById('cv');
+var ctx = cv.getContext('2d');
+var FONT = '"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif';
+var MFONT = '"Cambria Math","Times New Roman",serif';
+
+/* ---------- 时间轴（单位：秒，仅用于动画节奏） ---------- */
+var SEG = {e:2.2, h1:0.5, m:2.0, h2:0.55, l:1.2};
+var B1 = SEG.e;
+var B2 = B1 + SEG.h1;
+var B3 = B2 + SEG.m;
+var B4 = B3 + SEG.h2;
+var TOTAL = B4 + SEG.l;
+var STEP = 0.012;
+
+var opt = {trail:true, labels:true, geom:true, grid:false};
+var Lr = 1.8;                 /* 作图比例 L / h */
+var st = {t:0, playing:false, speed:1};
+var view = {s:1, ox:0, oy:0};
+var W = 0, H = 0;
+
+/* ---------- 几何（世界坐标，h = 1） ---------- */
+function geom(){
+  var L = Lr, r = L / Math.SQRT2;
+  return {
+    L: L, r: r,
+    p: {x:0, y:1},
+    a: {x:2, y:0},
+    b: {x:2, y:-L},
+    c: {x:2 + Math.sqrt(3)/2*L, y:-L/2},
+    O: {x:2 - L/2, y:-L/2},
+    x0: {x:0, y:-(2+L)}
+  };
+}
+
+/* ---------- 运动学：任意时刻粒子的位置与速度 ---------- */
+function positionAt(t){
+  var g = geom();
+  if(t <= B1){                                  /* 电场：类平抛 */
+    var u = Math.max(0, Math.min(1, t / SEG.e));
+    return {x: 2*u, y: 1-u*u, vx: 1, vy: -u, phase:'E'};
+  }
+  if(t <= B2){                                  /* 停在 a 点 */
+    return {x:2, y:0, vx:1, vy:-1, phase:'A'};
+  }
+  if(t <= B3){                                  /* 磁场：90° 圆弧 */
+    var th = Math.PI/4 - (Math.PI/2) * ((t-B2)/SEG.m);
+    return {
+      x: g.O.x + g.r*Math.cos(th),
+      y: g.O.y + g.r*Math.sin(th),
+      vx: Math.sin(th)*Math.SQRT2,
+      vy: -Math.cos(th)*Math.SQRT2,
+      phase:'M'
+    };
+  }
+  if(t <= B4){                                  /* 停在出射点 b */
+    return {x:2, y:-g.L, vx:-1, vy:-1, phase:'B'};
+  }
+  var u2 = Math.min(1, (t-B4)/SEG.l);           /* 沿 45° 直线出射 */
+  var s2 = 2*Math.SQRT2*u2;
+  return {x: 2 - s2/Math.SQRT2, y: -g.L - s2/Math.SQRT2, vx:-1, vy:-1, phase:'X'};
+}
+
+var pathCache = null, pathLr = null;
+function buildPath(){
+  if(pathCache && pathLr === Lr) return pathCache;
+  var arr = [];
+  for(var t=0; t<=TOTAL+1e-9; t+=STEP){
+    var q = positionAt(t);
+    arr.push({x:q.x, y:q.y, t:t});
+  }
+  pathCache = arr; pathLr = Lr;
+  return arr;
+}
+
+/* ---------- 坐标变换 ---------- */
+function X(x){ return view.ox + x*view.s; }
+function Y(y){ return view.oy - y*view.s; }
+
+function fitView(){
+  var g = geom();
+  var minX = -0.68, maxX = g.c.x + 0.90;
+  var minY = g.x0.y - 0.62, maxY = 1.62;
+  var pad = 22;
+  var s = Math.min((W - 2*pad)/(maxX-minX), (H - 2*pad)/(maxY-minY));
+  view.s = s;
+  view.ox = (W - (maxX-minX)*s)/2 - minX*s;
+  view.oy = (H - (maxY-minY)*s)/2 + maxY*s;
+}
+
+/* ---------- 绘图基础工具 ---------- */
+function txt(s, px, py, o){
+  o = o || {};
+  var size = o.size || 12.5;
+  ctx.font = (o.weight || '600') + ' ' + size + 'px ' + (o.math ? MFONT : FONT);
+  ctx.textAlign = o.align || 'left';
+  ctx.textBaseline = o.base || 'middle';
+  if(o.halo !== false){
+    ctx.lineWidth = o.halo || 3.6;
+    ctx.strokeStyle = o.haloColor || 'rgba(255,255,255,0.96)';
+    ctx.lineJoin = 'round';
+    ctx.strokeText(s, px, py);
+  }
+  ctx.fillStyle = o.color || '#1e293b';
+  ctx.fillText(s, px, py);
+}
+
+function wline(x1,y1,x2,y2){
+  ctx.beginPath();
+  ctx.moveTo(X(x1), Y(y1));
+  ctx.lineTo(X(x2), Y(y2));
+  ctx.stroke();
+}
+
+function circleWorld(cx,cy,r){
+  ctx.beginPath();
+  for(var i=0;i<=128;i++){
+    var a = i/128*Math.PI*2;
+    var px = X(cx + r*Math.cos(a)), py = Y(cy + r*Math.sin(a));
+    if(i) ctx.lineTo(px,py); else ctx.moveTo(px,py);
+  }
+  ctx.stroke();
+}
+
+function arcW(cx,cy,r,a0,a1){
+  var n = 40;
+  ctx.beginPath();
+  for(var i=0;i<=n;i++){
+    var a = a0 + (a1-a0)*i/n;
+    var px = X(cx + r*Math.cos(a)), py = Y(cy + r*Math.sin(a));
+    if(i) ctx.lineTo(px,py); else ctx.moveTo(px,py);
+  }
+  ctx.stroke();
+}
+
+function headAt(px,py,angWorld,size){
+  var a = -angWorld;
+  ctx.beginPath();
+  ctx.moveTo(px,py);
+  ctx.lineTo(px - size*Math.cos(a-0.38), py - size*Math.sin(a-0.38));
+  ctx.lineTo(px - size*Math.cos(a+0.38), py - size*Math.sin(a+0.38));
+  ctx.closePath();
+  ctx.fill();
+}
+
+function sArrow(x1,y1,x2,y2,color,w,head,dash){
+  var a = Math.atan2(y2-y1, x2-x1);
+  ctx.save();
+  ctx.strokeStyle = color; ctx.fillStyle = color;
+  ctx.lineWidth = w; ctx.lineCap = 'round';
+  if(dash) ctx.setLineDash(dash);
+  ctx.beginPath();
+  ctx.moveTo(x1,y1);
+  ctx.lineTo(x2 - head*Math.cos(a), y2 - head*Math.sin(a));
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(x2,y2);
+  ctx.lineTo(x2 - head*Math.cos(a-0.40), y2 - head*Math.sin(a-0.40));
+  ctx.lineTo(x2 - head*Math.cos(a+0.40), y2 - head*Math.sin(a+0.40));
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function rightAngle(p, u1, u2, s){
+  ctx.beginPath();
+  ctx.moveTo(X(p.x + u1.x*s), Y(p.y + u1.y*s));
+  ctx.lineTo(X(p.x + u1.x*s + u2.x*s), Y(p.y + u1.y*s + u2.y*s));
+  ctx.lineTo(X(p.x + u2.x*s), Y(p.y + u2.y*s));
+  ctx.stroke();
+}
+
+function inTri(p,A,B,C,m){
+  var d = (B.y-C.y)*(A.x-C.x) + (C.x-B.x)*(A.y-C.y);
+  var w1 = ((B.y-C.y)*(p.x-C.x) + (C.x-B.x)*(p.y-C.y))/d;
+  var w2 = ((C.y-A.y)*(p.x-C.x) + (A.x-C.x)*(p.y-C.y))/d;
+  var w3 = 1 - w1 - w2;
+  return w1>m && w2>m && w3>m;
+}
+
+/* ---------- 场景绘制 ---------- */
+function drawGrid(){
+  if(!opt.grid) return;
+  var g = geom();
+  var minX=-0.6, maxX=g.c.x+0.8, minY=g.x0.y-0.5, maxY=1.55;
+  ctx.save();
+  ctx.strokeStyle = '#eef2fa'; ctx.lineWidth = 1;
+  for(var x=Math.ceil(minX*2)/2; x<=maxX; x+=0.5) wline(x,minY,x,maxY);
+  for(var y=Math.ceil(minY*2)/2; y<=maxY; y+=0.5) wline(minX,y,maxX,y);
+  ctx.restore();
+}
+
+function drawRegions(){
+  var g = geom();
+
+  /* 第一象限：匀强电场 */
+  ctx.save();
+  var x1 = 2.92, y1 = 1.45;
+  ctx.fillStyle = 'rgba(217,119,6,0.055)';
+  ctx.fillRect(X(0), Y(y1), x1*view.s, y1*view.s);
+  ctx.setLineDash([7,6]);
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = 'rgba(217,119,6,0.50)';
+  ctx.strokeRect(X(0), Y(y1), x1*view.s, y1*view.s);
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  for(var ix=0.30; ix<=2.78; ix+=0.42){
+    for(var iy=0.16; iy<=1.06; iy+=0.44){
+      sArrow(X(ix), Y(iy), X(ix), Y(iy+0.26), 'rgba(217,119,6,0.55)', 1.5, 6);
+    }
+  }
+
+  /* 第四象限：正三角形磁场区 */
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(X(g.a.x), Y(g.a.y));
+  ctx.lineTo(X(g.b.x), Y(g.b.y));
+  ctx.lineTo(X(g.c.x), Y(g.c.y));
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(79,70,229,0.075)';
+  ctx.fill();
+  ctx.strokeStyle = '#6366f1';
+  ctx.lineWidth = 1.8;
+  ctx.stroke();
+  ctx.restore();
+
+  /* 磁场方向符号 ×（垂直纸面向里） */
+  ctx.save();
+  ctx.strokeStyle = 'rgba(79,70,229,0.50)';
+  ctx.lineWidth = 1.4;
+  var stepx = g.L*0.155, stepy = g.L*0.165, sz = g.L*0.032;
+  for(var px=g.a.x+0.04; px<g.c.x; px+=stepx){
+    for(var py=-g.L+0.04; py<0; py+=stepy){
+      if(inTri({x:px,y:py}, g.a, g.b, g.c, 0.145)){
+        ctx.beginPath();
+        ctx.moveTo(X(px-sz), Y(py-sz)); ctx.lineTo(X(px+sz), Y(py+sz));
+        ctx.moveTo(X(px+sz), Y(py-sz)); ctx.lineTo(X(px-sz), Y(py+sz));
+        ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+function drawAxes(){
+  var g = geom();
+  var xEnd = g.c.x + 0.55;
+  var yTop = 1.54;
+  var yBot = g.x0.y - 0.32;
+  ctx.save();
+  ctx.strokeStyle = '#334155'; ctx.fillStyle = '#334155'; ctx.lineWidth = 1.5;
+  wline(-0.58, 0, xEnd, 0);
+  headAt(X(xEnd), Y(0), 0, 9);
+  wline(0, yBot, 0, yTop);
+  headAt(X(0), Y(yTop), Math.PI/2, 9);
+  ctx.restore();
+  txt('x', X(xEnd)+10, Y(0)+1, {size:13.5, math:true, weight:'700'});
+  txt('y', X(0)+10, Y(yTop)-2, {size:13.5, math:true, weight:'700'});
+  txt('O', X(0)-8, Y(0)+13, {size:13, math:true, weight:'700', align:'right'});
+}
+
+function drawDims(){
+  ctx.save();
+  ctx.strokeStyle = '#a7b4c8'; ctx.lineWidth = 1;
+  wline(-0.26, 0, -0.26, 1);
+  wline(-0.32, 0, -0.20, 0);
+  wline(-0.32, 1, -0.20, 1);
+  wline(0, -0.32, 2, -0.32);
+  wline(0, -0.38, 0, -0.26);
+  wline(2, -0.38, 2, -0.26);
+  ctx.restore();
+  txt('h', X(-0.26)-9, Y(0.5), {size:12.5, math:true, align:'right', color:'#64748b'});
+  txt('2h', X(1.0), Y(-0.32)+16, {size:12.5, math:true, align:'center', color:'#64748b'});
+}
+
+function drawTrail(pts, idx){
+  if(idx < 1) return;
+  ctx.save();
+  ctx.strokeStyle = '#e11d48';
+  ctx.lineWidth = 2.6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(225,29,72,0.30)';
+  ctx.shadowBlur = 6;
+  ctx.beginPath();
+  for(var i=0;i<=idx;i++){
+    var p = pts[i];
+    if(i) ctx.lineTo(X(p.x), Y(p.y)); else ctx.moveTo(X(p.x), Y(p.y));
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawGeometry(){
+  var g = geom();
+  ctx.save();
+
+  ctx.setLineDash([4,5]);
+  ctx.lineWidth = 1.1;
+  ctx.strokeStyle = 'rgba(124,58,237,0.36)';
+  circleWorld(g.O.x, g.O.y, g.r);
+
+  ctx.strokeStyle = 'rgba(124,58,237,0.62)';
+  ctx.lineWidth = 1.2;
+  wline(g.O.x, g.O.y, g.a.x, g.a.y);
+  wline(g.O.x, g.O.y, g.b.x, g.b.y);
+  ctx.setLineDash([]);
+
+  /* 圆心角 90° */
+  ctx.strokeStyle = 'rgba(124,58,237,0.85)';
+  ctx.lineWidth = 1.2;
+  arcW(g.O.x, g.O.y, Math.min(0.30, g.r*0.30), -Math.PI/4, Math.PI/4);
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = '#7c3aed';
+  ctx.beginPath(); ctx.arc(X(g.O.x), Y(g.O.y), 3.6, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  /* 直角标记（半径 ⊥ 速度） */
+  ctx.save();
+  ctx.strokeStyle = 'rgba(124,58,237,0.75)';
+  ctx.lineWidth = 1.1;
+  rightAngle(g.a, {x:-Math.SQRT1_2, y:-Math.SQRT1_2}, {x:Math.SQRT1_2, y:-Math.SQRT1_2}, 0.11);
+  rightAngle(g.b, {x:Math.SQRT1_2, y:Math.SQRT1_2}, {x:-Math.SQRT1_2, y:-Math.SQRT1_2}, 0.11);
+  ctx.restore();
+}
+
+function drawVectors(){
+  var g = geom();
+  var q = positionAt(st.t);
+
+  /* 初速度 v0 */
+  sArrow(X(0), Y(1), X(0.62), Y(1), '#0f766e', 2.4, 9);
+  txt('v₀', X(0.62)+2, Y(1)-12, {size:12.5, math:true, color:'#0f766e', align:'center'});
+
+  /* a 点末速度 */
+  if(st.t >= B1 - 0.01){
+    var ax = X(g.a.x), ay = Y(g.a.y);
+    var la = 1.0;
+    sArrow(ax, ay, ax + la*Math.SQRT1_2*view.s, ay + la*Math.SQRT1_2*view.s, '#0f766e', 2.6, 10);
+    txt('v_a = √2v₀', ax + la*0.74*view.s, ay + la*0.62*view.s, {size:12, math:true, color:'#0f766e', align:'left'});
+  }
+
+  /* 出射速度 */
+  if(st.t >= B3 - 0.01){
+    var bx = X(g.b.x), by = Y(g.b.y);
+    var lb = 1.0;
+    sArrow(bx, by, bx - lb*Math.SQRT1_2*view.s, by + lb*Math.SQRT1_2*view.s, '#0f766e', 2.6, 10);
+    txt('√2v₀', bx - lb*0.80*view.s, by + lb*0.62*view.s, {size:12, math:true, color:'#0f766e', align:'center'});
+  }
+
+  /* 运动中的速度矢量 */
+  var sp = Math.hypot(q.vx, q.vy) || 1;
+  var ux = q.vx/sp, uy = q.vy/sp;
+  var len = 0.56*sp;
+  var sx = X(q.x), sy = Y(q.y);
+  var ex = X(q.x + ux*len), ey = Y(q.y + uy*len);
+  sArrow(sx, sy, ex, ey, '#0b8a7d', 2.6, 10);
+  txt('v', ex + ux*12, ey + uy*12, {size:12.5, math:true, color:'#0b8a7d', align:'center'});
+}
+
+function drawParticle(){
+  var q = positionAt(st.t);
+  var px = X(q.x), py = Y(q.y);
+  var gr = ctx.createRadialGradient(px, py, 0, px, py, 21);
+  gr.addColorStop(0, 'rgba(244,63,94,0.42)');
+  gr.addColorStop(1, 'rgba(244,63,94,0)');
+  ctx.fillStyle = gr;
+  ctx.beginPath(); ctx.arc(px, py, 21, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(px, py, 6.4, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.lineWidth = 2.8; ctx.strokeStyle = '#e11d48'; ctx.stroke();
+}
+
+function drawLabels(){
+  var g = geom();
+
+  /* 点标注 */
+  txt('p(0, h)', X(0)-10, Y(1)-13, {size:12.5, align:'right'});
+  txt('a(2h, 0)', X(2)+10, Y(0)-13, {size:12.5, align:'left'});
+  txt('b', X(2)-10, Y(-g.L)+1, {size:13, math:true, align:'right', weight:'700'});
+  txt('c', X(g.c.x)+10, Y(g.c.y)+1, {size:13, math:true, align:'left', weight:'700'});
+  txt('O′', X(g.O.x)-7, Y(g.O.y)+14, {size:12.5, math:true, align:'right', color:'#6d28d9'});
+
+  /* 半径 r 与弦 */
+  txt('r', X((g.O.x+g.a.x)/2)-6, Y((g.O.y+g.a.y)/2)-7, {size:12.5, math:true, align:'right', color:'#6d28d9'});
+  txt('r', X((g.O.x+g.b.x)/2)+7, Y((g.O.y+g.b.y)/2)+9, {size:12.5, math:true, align:'left', color:'#6d28d9'});
+  txt('90°', X(g.O.x)+0.40, Y(g.O.y)-0.03, {size:11.5, math:true, align:'left', color:'#6d28d9'});
+  txt('弦 √2r', X(2)-10, Y(-g.L*0.5)-2, {size:11.5, math:true, align:'right', color:'#6d28d9'});
+
+  /* 边长与几何关系 */
+  var mbc = {x:(g.b.x+g.c.x)/2, y:(g.b.y+g.c.y)/2};
+  txt('L', X(mbc.x)+12, Y(mbc.y)-10, {size:12.5, math:true, align:'left', color:'#4338ca'});
+  txt('ab ∥ y 轴', X(2)+13, Y(-g.L*0.86), {size:11, align:'left', color:'#64748b'});
+
+  /* 区域说明 */
+  txt('匀强电场 E（+y 方向）', X(0.16), Y(1.34), {size:12, align:'left', color:'#b45309'});
+  txt('匀强磁场 B（垂直纸面向里）', X(g.b.x+0.40*g.L), Y(-g.L-0.27), {size:12, align:'center', color:'#4338ca'});
+  txt('正三角形区域，边长 L', X(g.b.x+0.40*g.L), Y(-g.L-0.50), {size:11, align:'center', color:'#7c8aa5'});
+
+  /* 45° 角标注（a 点：与 y 轴负方向） */
+  ctx.save();
+  ctx.setLineDash([3,4]);
+  ctx.strokeStyle = 'rgba(100,116,139,0.55)';
+  ctx.lineWidth = 1;
+  wline(2, 0, 2, -0.62);
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle = '#0b8a7d'; ctx.lineWidth = 1.3;
+  arcW(2, 0, 0.36, -Math.PI/2, -Math.PI/4);
+  ctx.restore();
+  txt('45°', X(2)+0.30, Y(-0.33), {size:11.5, math:true, color:'#0b8a7d', align:'left'});
+
+  /* 出射点与第三象限 */
+  var x0 = g.x0;
+  ctx.save();
+  ctx.fillStyle = '#e11d48';
+  ctx.beginPath(); ctx.arc(X(x0.x), Y(x0.y), 3.2, 0, Math.PI*2); ctx.fill();
+  ctx.setLineDash([3,4]);
+  ctx.strokeStyle = 'rgba(100,116,139,0.55)';
+  ctx.lineWidth = 1;
+  wline(0, x0.y, 0, x0.y + 0.55);
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle = '#0b8a7d'; ctx.lineWidth = 1.3;
+  arcW(0, x0.y, 0.30, -Math.PI*3/4, -Math.PI/2);
+  ctx.restore();
+  txt('45°', X(0)-0.44, Y(x0.y)+0.15, {size:11.5, math:true, color:'#0b8a7d', align:'right'});
+  txt('交 y 轴进入第Ⅲ象限', X(0)+13, Y(x0.y)+8, {size:11.5, color:'#475569', align:'left'});
+}
+
+/* ---------- 主绘制 ---------- */
+function draw(){
+  ctx.clearRect(0, 0, W, H);
+  drawGrid();
+  drawRegions();
+  drawAxes();
+  drawDims();
+
+  var pts = buildPath();
+  var idx = Math.max(0, Math.min(pts.length-1, Math.round(st.t/STEP)));
+
+  if(opt.trail){
+    ctx.save();
+    ctx.setLineDash([5,6]);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = 'rgba(225,29,72,0.22)';
+    ctx.beginPath();
+    for(var i=idx;i<pts.length;i++){
+      var p = pts[i];
+      if(i===idx) ctx.moveTo(X(p.x), Y(p.y)); else ctx.lineTo(X(p.x), Y(p.y));
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  if(opt.geom) drawGeometry();
+  if(opt.trail) drawTrail(pts, idx);
+
+  drawVectors();
+  drawParticle();
+  if(opt.labels) drawLabels();
+}
+
+/* ---------- 尺寸自适应 ---------- */
+function resize(){
+  var box = cv.parentElement.getBoundingClientRect();
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = Math.max(320, Math.round(box.width));
+  H = Math.max(300, Math.round(box.height));
+  cv.width = Math.round(W*dpr);
+  cv.height = Math.round(H*dpr);
+  cv.style.width = W + 'px';
+  cv.style.height = H + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fitView();
+  draw();
+}
+
+/* ---------- 讲解文案 ---------- */
+var STAGE = [
+  {
+    title:'① 电场中：类平抛运动（第 1 问）',
+    html:'<p>粒子自 <b>p(0, h)</b> 沿 +x 方向以 <b>v₀</b> 射入匀强电场：x 方向不受力，做匀速直线运动；y 方向受恒定电场力，做匀加速运动。两者合成，轨迹是一条<b>抛物线（类平抛）</b>。</p>' +
+         '<p>· 由出射点 <b>a(2h, 0)</b>：<b>t = 2h/v₀</b><br>· 竖直位移 h = ½at² ⟹ <b>a = v₀²/(2h)</b><br>· qE = ma ⟹ <b>E = mv₀²/(2qh)</b></p>' +
+         '<p class="tip">注意：轨迹向 −y 弯曲，而场强指向 +y —— 电场力与场强反向，说明粒子带负电。</p>'
+  },
+  {
+    title:'② 到达 a 点：速度的合成（第 2 问）',
+    html:'<p>类平抛的末速度由水平分量与竖直分量合成，方向沿轨迹在 a 点的切线方向。</p>' +
+         '<p>· v_y = at = v₀<br>· v_a = √(v₀² + v_y²) = <b>√2 v₀</b><br>· tanθ = v_y/v₀ = 1 ⟹ <b>θ = 45°</b></p>' +
+         '<p class="tip">末速度指向第Ⅳ象限，与 y 轴负方向成 45°（即与 x 轴正方向成 45° 偏下），这就是粒子进入磁场时的速度。</p>'
+  },
+  {
+    title:'③ 磁场中：匀速圆周运动（第 3 问）',
+    html:'<p>洛伦兹力始终垂直于速度、大小不变，粒子在正三角形区域内做<b>匀速圆周运动</b>。圆心 O′ 位于过 a 点且垂直于 v_a 的直线上（左下方 45° 方向）。</p>' +
+         '<p>· qv_aB = mv_a²/r ⟹ <b>r = √2mv₀/(qB)</b><br>· 速度方向由“右下 45°”变为“左下 45°”，共转过 <b>90°</b>，故圆弧所对圆心角为 90°<br>· 弦长 = 2r·sin45° = <b>√2 r</b>，出射点落在 a 正下方的 ab 边上</p>' +
+         '<p class="tip">ab 边与 y 轴平行，所以出射点必在竖直边 ab 上，且距 a 点为 √2r。</p>'
+  },
+  {
+    title:'④ 45° 出射：B 的最小值（第 3 问）',
+    html:'<p>要让粒子沿 45° 方向出射，它必须在磁场中恰好转过 90°，这要求整段 90° 圆弧都落在三角形内，即 <b>√2 r ≤ L</b>。</p>' +
+         '<p>· 由 √2r ≤ L 得 r ≤ L/√2；B 越小 r 越大，取临界 <b>r = L/√2</b>（轨迹恰好经过 b 点）<br>· B_min = √2mv₀ /(q·L/√2) = <b>2mv₀/(qL)</b></p>' +
+         '<p class="tip">结论：B 的最小值为 2mv₀/(qL)，此时轨迹的终点正好是三角形的顶点 b。</p>'
+  }
+];
+
+var curStage = -1;
+var elTitle = document.getElementById('stTitle');
+var elBody = document.getElementById('stBody');
+var elHud = document.getElementById('hudStage');
+var elPct = document.getElementById('hudPct');
+var elPlay = document.getElementById('btnPlay');
+var elScrub = document.getElementById('scrub');
+var chips = document.querySelectorAll('#chips button');
+var qas = [document.getElementById('qa1'), document.getElementById('qa2'), document.getElementById('qa3')];
+
+function stageOf(t){
+  if(t < B1) return 0;
+  if(t < B2) return 1;
+  if(t < B3) return 2;
+  return 3;
+}
+
+function applyStage(i){
+  if(i === curStage) return;
+  curStage = i;
+  elTitle.textContent = STAGE[i].title;
+  elBody.innerHTML = STAGE[i].html;
+  elHud.textContent = STAGE[i].title.slice(0, 1) + STAGE[i].title.slice(1, 12).replace(/：.*/, '');
+  for(var k=0;k<chips.length;k++) chips[k].className = (k===i ? 'on' : '');
+  var active = (i===0) ? 0 : (i===1 ? 1 : 2);
+  for(var j=0;j<qas.length;j++) qas[j].className = 'qa' + (j===active ? ' active' : '');
+}
+
+function syncUI(){
+  elScrub.value = String(Math.round(st.t/TOTAL*1000));
+  elPct.textContent = Math.round(st.t/TOTAL*100) + '%';
+  applyStage(stageOf(st.t));
+}
+
+function setPlaying(p){
+  st.playing = p;
+  elPlay.textContent = p ? '❚❚ 暂停' : '▶ 播放';
+}
+
+/* ---------- 交互 ---------- */
+elPlay.addEventListener('click', function(){
+  if(!st.playing && st.t >= TOTAL - 1e-6) st.t = 0;
+  setPlaying(!st.playing);
+});
+
+document.getElementById('btnReplay').addEventListener('click', function(){
+  st.t = 0;
+  setPlaying(true);
+  syncUI();
+  draw();
+});
+
+elScrub.addEventListener('input', function(){
+  st.t = Number(elScrub.value)/1000*TOTAL;
+  setPlaying(false);
+  syncUI();
+  draw();
+});
+
+for(var c=0;c<chips.length;c++){
+  (function(btn){
+    btn.addEventListener('click', function(){
+      var i = Number(btn.getAttribute('data-jump'));
+      st.t = [0, B1, B2, B3][i];
+      setPlaying(false);
+      syncUI();
+      draw();
+    });
+  })(chips[c]);
+}
+
+var segBtns = document.querySelectorAll('#segSpeed button');
+for(var s=0;s<segBtns.length;s++){
+  (function(btn){
+    btn.addEventListener('click', function(){
+      st.speed = Number(btn.getAttribute('data-sp'));
+      for(var k=0;k<segBtns.length;k++) segBtns[k].className = '';
+      btn.className = 'on';
+    });
+  })(segBtns[s]);
+}
+
+document.getElementById('tTrail').addEventListener('change', function(e){ opt.trail = e.target.checked; draw(); });
+document.getElementById('tLabel').addEventListener('change', function(e){ opt.labels = e.target.checked; draw(); });
+document.getElementById('tGeom').addEventListener('change', function(e){ opt.geom = e.target.checked; draw(); });
+document.getElementById('tGrid').addEventListener('change', function(e){ opt.grid = e.target.checked; draw(); });
+
+var ratio = document.getElementById('ratio');
+var ratioVal = document.getElementById('ratioVal');
+var noteRatio = document.getElementById('noteRatio');
+ratio.addEventListener('input', function(){
+  Lr = Number(ratio.value);
+  ratioVal.textContent = Lr.toFixed(2);
+  noteRatio.textContent = Lr.toFixed(2);
+  pathCache = null;
+  fitView();
+  draw();
+});
+
+window.addEventListener('keydown', function(e){
+  if(e.code === 'Space'){ e.preventDefault(); elPlay.click(); }
+  else if(e.key === 'r' || e.key === 'R'){ document.getElementById('btnReplay').click(); }
+  else if(e.key === 'ArrowRight'){ st.t = Math.min(TOTAL, st.t + 0.25); setPlaying(false); syncUI(); draw(); }
+  else if(e.key === 'ArrowLeft'){ st.t = Math.max(0, st.t - 0.25); setPlaying(false); syncUI(); draw(); }
+});
+
+/* ---------- 主循环 ---------- */
+var last = 0;
+function loop(ts){
+  if(!last) last = ts;
+  var dt = Math.min(0.06, (ts-last)/1000);
+  last = ts;
+  if(st.playing){
+    st.t += dt*st.speed;
+    if(st.t >= TOTAL){ st.t = TOTAL; setPlaying(false); }
+    syncUI();
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* ---------- 启动 ---------- */
+if(window.ResizeObserver){
+  new ResizeObserver(function(){ resize(); }).observe(cv.parentElement);
+} else {
+  window.addEventListener('resize', resize);
+}
+/* 支持 ?t=0~1 直接定格某一时刻，便于投屏截图 */
+try{
+  var mm = (location.search||'').match(/[?&]t=([0-9.]+)/);
+  if(mm){ st.t = Math.max(0, Math.min(TOTAL, Number(mm[1]) * TOTAL)); }
+}catch(e){}
+
+resize();
+applyStage(0);
+syncUI();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

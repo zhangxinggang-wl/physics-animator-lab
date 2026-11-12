@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>竖直上抛运动 · 全程法与分段法</title>
+<style>
+:root{
+  --bg:#f4f7fb; --card:#ffffff; --ink:#1e293b; --sub:#64748b; --line:#e4e9f2;
+  --blue:#2563eb; --blue-soft:#eaf1ff;
+  --up:#f97316; --up-soft:#fff2e6;
+  --down:#0891b2; --down-soft:#e6f6fa;
+  --red:#e11d48; --red-soft:#fdeaef;
+  --green:#16a34a; --green-soft:#e8f7ee;
+  --axis:#94a3b8;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+  font-size:15px; line-height:1.7;
+}
+.wrap{max-width:1220px; margin:0 auto; padding:24px 20px 60px}
+header.top{margin-bottom:20px}
+header.top h1{font-size:24px; margin:0 0 6px; letter-spacing:.5px}
+header.top p{margin:0; color:var(--sub); font-size:14px}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:16px 18px; box-shadow:0 1px 3px rgba(16,24,40,.05); margin-bottom:18px;
+}
+.card > h2{font-size:16px; margin:0 0 12px; display:flex; align-items:center; gap:8px}
+.card > h2 .no{
+  display:inline-flex; width:22px; height:22px; border-radius:7px; background:var(--blue);
+  color:#fff; font-size:12px; align-items:center; justify-content:center; font-weight:600
+}
+.grid-main{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:18px; align-items:start}
+@media (max-width:960px){ .grid-main{grid-template-columns:1fr} }
+
+/* ---------- 动画区 ---------- */
+#scene{width:100%; height:560px; display:block; border-radius:10px; background:#fbfcfe}
+@media (max-width:640px){ #scene{height:440px} }
+.controls{margin-top:14px; display:flex; flex-direction:column; gap:10px}
+.ctl-row{display:flex; flex-wrap:wrap; gap:14px 18px; align-items:center}
+.ctl{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--sub)}
+.ctl label{white-space:nowrap}
+.ctl input[type=range]{width:130px; accent-color:var(--blue)}
+.ctl .val{
+  min-width:64px; text-align:right; color:var(--ink); font-weight:600;
+  font-variant-numeric:tabular-nums
+}
+.btn{
+  border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:8px;
+  padding:6px 12px; font-size:13px; cursor:pointer; font-family:inherit; transition:.15s;
+}
+.btn:hover{border-color:var(--blue); color:var(--blue)}
+.btn.primary{background:var(--blue); border-color:var(--blue); color:#fff}
+.btn.primary:hover{background:#1d4ed8; color:#fff}
+.btn.sm{padding:4px 9px; font-size:12px}
+select.btn{padding:6px 8px}
+.chk{display:flex; align-items:center; gap:5px; font-size:13px; color:var(--sub); cursor:pointer}
+.timeline{display:flex; align-items:center; gap:10px; margin-top:2px}
+.timeline input[type=range]{flex:1; accent-color:var(--blue)}
+.timeline .now{font-variant-numeric:tabular-nums; font-weight:600; min-width:76px; text-align:right}
+
+.readout{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px}
+@media (max-width:560px){ .readout{grid-template-columns:repeat(2,1fr)} }
+.ro{background:#f8fafc; border:1px solid var(--line); border-radius:10px; padding:8px 10px}
+.ro .k{font-size:11px; color:var(--sub); letter-spacing:.5px}
+.ro .v{font-size:18px; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.4}
+.ro .u{font-size:11px; color:var(--sub); font-weight:500}
+.tag{
+  display:inline-block; padding:2px 9px; border-radius:999px; font-size:12px; font-weight:600
+}
+.tag.up{background:var(--up-soft); color:var(--up)}
+.tag.top{background:var(--red-soft); color:var(--red)}
+.tag.down{background:var(--down-soft); color:var(--down)}
+.tag.land{background:#eef2f7; color:var(--sub)}
+
+/* ---------- 图表 ---------- */
+.chart{width:100%; height:186px; display:block; margin-bottom:6px}
+.chart-cap{font-size:12px; color:var(--sub); margin:0 0 10px}
+table.data{width:100%; border-collapse:collapse; font-size:13px}
+table.data th, table.data td{border-bottom:1px solid var(--line); padding:6px 8px; text-align:left}
+table.data th{background:#f8fafc; font-weight:600; color:var(--sub); width:52%}
+table.data td{font-variant-numeric:tabular-nums; text-align:right}
+table.data tr:last-child th, table.data tr:last-child td{border-bottom:none}
+
+/* ---------- 方法对比 ---------- */
+.methods{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:860px){ .methods{grid-template-columns:1fr} }
+.method{border:1px solid var(--line); border-radius:12px; overflow:hidden}
+.method .hd{padding:9px 14px; font-weight:700; font-size:14px; color:#fff; display:flex; justify-content:space-between; align-items:center}
+.method.a .hd{background:linear-gradient(90deg,#2563eb,#3b82f6)}
+.method.b .hd{background:linear-gradient(90deg,#f97316,#fb923c)}
+.method .hd small{font-weight:400; opacity:.9; font-size:12px}
+.method .bd{padding:12px 14px}
+.method p{margin:0 0 8px; font-size:13.5px}
+.fml{
+  background:#f8fafc; border-left:3px solid var(--blue); border-radius:0 8px 8px 0;
+  padding:7px 12px; margin:8px 0; font-size:15px; font-family:"Cambria Math",Cambria,Georgia,serif;
+  font-variant-numeric:tabular-nums;
+}
+.method.b .fml{border-left-color:var(--up)}
+.note{font-size:12.5px; color:var(--sub); margin:6px 0 0}
+.warn{background:var(--red-soft); border-left:3px solid var(--red); border-radius:0 8px 8px 0; padding:7px 12px; margin:10px 0 0; font-size:13px}
+.live{background:#f8fafc; border:1px dashed var(--line); border-radius:10px; padding:10px 12px; margin-top:10px; font-size:13px}
+.live .t{font-weight:700; font-size:12.5px; color:var(--sub); margin-bottom:4px}
+.live .row{display:flex; justify-content:space-between; gap:10px; padding:2px 0; font-variant-numeric:tabular-nums}
+
+ul.tips{margin:0; padding-left:20px; font-size:13.5px}
+ul.tips li{margin-bottom:6px}
+.kbd{background:#eef2f7; border-radius:5px; padding:1px 6px; font-size:12.5px; font-family:"Cambria Math",Cambria,serif}
+
+/* ---------- 练习 ---------- */
+.q{border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px}
+.q .qt{font-weight:600; font-size:14px; margin-bottom:8px}
+.opts{display:flex; flex-wrap:wrap; gap:8px}
+.opt{border:1px solid var(--line); background:#fff; border-radius:8px; padding:6px 12px; font-size:13px; cursor:pointer; font-family:inherit}
+.opt:hover{border-color:var(--blue)}
+.opt.ok{background:var(--green-soft); border-color:var(--green); color:var(--green)}
+.opt.no{background:var(--red-soft); border-color:var(--red); color:var(--red)}
+.exp{display:none; margin-top:9px; font-size:13px; background:#f8fafc; border-radius:8px; padding:9px 12px}
+.exp.show{display:block}
+.exp b{color:var(--blue)}
+footer{text-align:center; color:var(--sub); font-size:12px; margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>竖直上抛运动 · 全程法 与 分段法</h1>
+  <p>拖动参数实时观察运动过程，对照右侧图表，理解两种解题方法的思路与适用场合。</p>
+</header>
+
+<div class="grid-main">
+
+  <!-- 左：动画 -->
+  <div class="card">
+    <h2><span class="no">1</span>运动过程演示</h2>
+    <canvas id="scene"></canvas>
+
+    <div class="controls">
+      <div class="ctl-row">
+        <div class="ctl"><label>初速度 v₀</label><input id="sV0" type="range" min="2" max="40" step="0.5" value="20"><span class="val" id="vV0">20.0 m/s</span></div>
+        <div class="ctl"><label>重力加速度 g</label><input id="sG" type="range" min="1" max="20" step="0.1" value="10"><span class="val" id="vG">10.0 m/s²</span></div>
+      </div>
+      <div class="ctl-row">
+        <div class="ctl"><label>抛出点离地高度 h₀</label><input id="sH0" type="range" min="0" max="30" step="0.5" value="0"><span class="val" id="vH0">0.0 m</span></div>
+        <button class="btn sm" data-g="9.8">地球 9.8</button>
+        <button class="btn sm" data-g="1.6">月球 1.6</button>
+        <button class="btn sm" data-g="3.7">火星 3.7</button>
+      </div>
+      <div class="ctl-row">
+        <button class="btn primary" id="btnPlay">⏸ 暂停</button>
+        <button class="btn" id="btnReset">↺ 重播</button>
+        <select class="btn" id="selSpeed">
+          <option value="0.25">0.25×</option>
+          <option value="0.5">0.5×</option>
+          <option value="1" selected>1×</option>
+          <option value="2">2×</option>
+        </select>
+        <button class="btn sm" id="btnTop">跳到最高点</button>
+        <button class="btn sm" id="btnBack">跳到落回抛出点</button>
+        <button class="btn sm" id="btnLand">跳到落地</button>
+        <label class="chk"><input type="checkbox" id="ckSym" checked>对称位置</label>
+        <label class="chk"><input type="checkbox" id="ckTrail" checked>运动轨迹</label>
+      </div>
+      <div class="ctl-row timeline">
+        <span style="font-size:13px;color:var(--sub)">时间轴</span>
+        <input id="sT" type="range" min="0" max="4" step="0.005" value="0">
+        <span class="now" id="vT">t = 0.00 s</span>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="ro"><div class="k">当前时刻 t</div><div class="v"><span id="roT">0.00</span> <span class="u">s</span></div></div>
+      <div class="ro"><div class="k">速度 v（向上为正）</div><div class="v"><span id="roV">20.00</span> <span class="u">m/s</span></div></div>
+      <div class="ro"><div class="k">位移 h（相对抛出点）</div><div class="v"><span id="roH">0.00</span> <span class="u">m</span></div></div>
+      <div class="ro"><div class="k">离地高度</div><div class="v"><span id="roG">0.00</span> <span class="u">m</span></div></div>
+      <div class="ro"><div class="k">路程（累计轨迹长度）</div><div class="v"><span id="roS">0.00</span> <span class="u">m</span></div></div>
+      <div class="ro"><div class="k">运动阶段</div><div class="v" style="font-size:15px"><span id="roStage" class="tag up">上升中</span></div></div>
+    </div>
+  </div>
+
+  <!-- 右：图表 + 数据表 -->
+  <div class="card">
+    <h2><span class="no">2</span>图像与关键数据</h2>
+    <canvas id="chartH" class="chart"></canvas>
+    <p class="chart-cap">h–t 图像：整段是一条开口向下的抛物线（全程法只看这一个函数）</p>
+    <canvas id="chartV" class="chart"></canvas>
+    <p class="chart-cap">v–t 图像：一条斜向下的直线，斜率 = −g；与时间轴相交处即最高点</p>
+    <table class="data">
+      <tr><th>上升到最高点用时 t₁ = v₀/g</th><td id="dT1">2.00 s</td></tr>
+      <tr><th>最大高度（相对抛出点）H = v₀²/(2g)</th><td id="dH">20.00 m</td></tr>
+      <tr><th>最高点离地高度 H + h₀</th><td id="dHg">20.00 m</td></tr>
+      <tr><th>落回抛出点时刻 2v₀/g</th><td id="dT2">4.00 s</td></tr>
+      <tr><th>落回抛出点时速度 −v₀</th><td id="dV2">−20.00 m/s</td></tr>
+      <tr><th>落地时刻 t₃</th><td id="dT3">4.00 s</td></tr>
+      <tr><th>落地速度 v₃ = −√(v₀²+2gh₀)</th><td id="dV3">−20.00 m/s</td></tr>
+      <tr><th>全程路程</th><td id="dS">40.00 m</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- 3 两种方法 -->
+<div class="card">
+  <h2><span class="no">3</span>两种解法：同一时刻，两种思路</h2>
+  <div class="methods">
+
+    <div class="method a">
+      <div class="hd"><span>全程法（整体法）</span><small>一个公式管到底</small></div>
+      <div class="bd">
+        <p><b>思路：</b>把「上升 + 下落」看成<b>同一个匀变速直线运动</b>。全程加速度恒为 <span class="kbd">a = −g</span>，只列一次方程。</p>
+        <div class="fml">v = v₀ − g t</div>
+        <div class="fml">h = v₀ t − ½ g t²</div>
+        <div class="fml">v² − v₀² = −2 g h</div>
+        <p class="note"><b>符号规则（必须先定正方向）：</b>取<b>竖直向上为正</b>。v₀ 向上为正值；v &gt; 0 表示向上运动、v &lt; 0 表示向下运动；h &gt; 0 在抛出点上方、h &lt; 0 在抛出点下方。</p>
+        <div class="live">
+          <div class="t">此刻（<span id="aT">0.00</span> s）用全程法：</div>
+          <div class="row"><span>v = v₀ − g t = <span id="aVexp">20.0 − 10.0×0.00</span></span><b>= <span id="aV">20.00</span> m/s</b></div>
+          <div class="row"><span>h = v₀t − ½gt² = <span id="aHexp">20.0×0.00 − 5.0×0.00²</span></span><b>= <span id="aH">0.00</span> m</b></div>
+        </div>
+        <div class="warn">⚠ 全程法最容易错的地方：把「位移 h」当成「离地高度」。公式里的 h 是<b>相对抛出点</b>的位移，落到抛出点下方时 h 为<b>负值</b>（例如求从楼顶抛出落到地面，应令 h = −h₀）。</div>
+      </div>
+    </div>
+
+    <div class="method b">
+      <div class="hd"><span>分段法</span><small>拆成上升、下落两段</small></div>
+      <div class="bd">
+        <p><b>思路：</b>把运动拆成两段分别处理，最高点是分界点。</p>
+        <p style="margin-bottom:4px"><b>① 上升段</b>（末速度为 0 的匀减速）：</p>
+        <div class="fml">t₁ = v₀ / g &nbsp;&nbsp;&nbsp; H = v₀² / (2g)</div>
+        <p style="margin:8px 0 4px"><b>② 最高点</b>（速度为零的瞬间）：</p>
+        <div class="fml">v = 0 &nbsp;，&nbsp; a = −g（仍为 g，向下）</div>
+        <p style="margin:8px 0 4px"><b>③ 下落段</b>（初速度为 0 的自由落体，从最高点往下算）：</p>
+        <div class="fml">h↓ = ½ g (t − t₁)² &nbsp;&nbsp;&nbsp; v↓ = g (t − t₁)</div>
+        <p class="note"><b>对称性（分段法的捷径）：</b>上升与下落经过<b>同一位置</b>时速率相等、方向相反；上升到最高点用时 = 从最高点落回抛出点用时 = v₀/g。</p>
+        <div class="live">
+          <div class="t">此刻（<span id="bT">0.00</span> s）用分段法：<span id="bStage" class="tag up">上升中</span></div>
+          <div class="row"><span>上升段用时 t₁ = v₀/g</span><b>= <span id="bT1">2.00</span> s</b></div>
+          <div class="row"><span>最大高度 H = v₀²/(2g)</span><b>= <span id="bH">20.00</span> m</b></div>
+          <div class="row"><span id="bK1">已上升时间</span><b>= <span id="bTk">0.00</span> s</b></div>
+          <div class="row"><span id="bK2">上升高度 h↑ = v₀t − ½gt²</span><b>= <span id="bHk">0.00</span> m</b></div>
+          <div class="row"><span>当前位移 h = H − h↓</span><b>= <span id="bHv">0.00</span> m</b></div>
+        </div>
+        <div class="warn">⚠ 分段法最容易错的地方：认为最高点「速度为 0，加速度也为 0」。实际上最高点加速度仍是 g 竖直向下，否则小球就会停在空中不动了。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4 对比求解 -->
+<div class="card">
+  <h2><span class="no">4</span>同一问题对比：求落地时间 t₃ 与落地速度 v₃</h2>
+  <div class="methods">
+    <div class="method a">
+      <div class="hd"><span>全程法求解</span><small>一步到位</small></div>
+      <div class="bd">
+        <p>取向上为正，落地时位移 h = −h₀，代入 <span class="kbd">h = v₀t − ½gt²</span>：</p>
+        <div class="fml">−h₀ = v₀ t − ½ g t²</div>
+        <div class="fml">t₃ = ( v₀ + √(v₀² + 2 g h₀) ) / g</div>
+        <div class="fml">v₃ = v₀ − g t₃ = −√(v₀² + 2 g h₀)</div>
+        <div class="live">
+          <div class="row"><span>t₃ = (<span id="c1a">20.0</span> + √(<span id="c1b">400.0</span> + <span id="c1c">0.0</span>)) / <span id="c1d">10.0</span></span><b>= <span id="c1r">4.00</span> s</b></div>
+          <div class="row"><span>v₃ = −√(<span id="c2a">400.0</span> + <span id="c2b">0.0</span>)</span><b>= <span id="c2r">−20.00</span> m/s</b></div>
+        </div>
+        <p class="note">✔ 全程法不需要找最高点、不需要判断落到哪一段，<b>特别适合抛出点与落地点不在同一水平面</b>（如楼顶抛出落到地面）的问题。</p>
+      </div>
+    </div>
+    <div class="method b">
+      <div class="hd"><span>分段法求解</span><small>分三段累加</small></div>
+      <div class="bd">
+        <p>先算上升，再从最高点自由落体到地面：</p>
+        <div class="fml">t₁ = v₀ / g &nbsp;，&nbsp; H = v₀² / (2g)</div>
+        <div class="fml">下落总高度 = H + h₀ &nbsp;→&nbsp; t₂ = √( 2(H + h₀) / g )</div>
+        <div class="fml">t₃ = t₁ + t₂ &nbsp;，&nbsp; v₃ = −g t₂</div>
+        <div class="live">
+          <div class="row"><span>t₁ = <span id="c3a">20.0</span>/<span id="c3b">10.0</span>，H = <span id="c3c">20.00</span> m</span><b>t₁ = <span id="c3r">2.00</span> s</b></div>
+          <div class="row"><span>t₂ = √(2×(<span id="c4a">20.00</span>+<span id="c4b">0.0</span>)/<span id="c4c">10.0</span>)</span><b>= <span id="c4r">2.00</span> s</b></div>
+          <div class="row"><span>t₃ = t₁ + t₂</span><b>= <span id="c5r">4.00</span> s</b></div>
+          <div class="row"><span>v₃ = −g t₂</span><b>= <span id="c6r">−20.00</span> m/s</b></div>
+        </div>
+        <p class="note">✔ 分段法步骤多但每一步都是熟悉的模型（匀减速到零 + 自由落体），<b>适合求最高点、上升/下落分段时间和分段路程</b>。</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;background:var(--green-soft);border-left:3px solid var(--green);border-radius:0 8px 8px 0;padding:9px 14px;font-size:13.5px">
+    两种方法结果完全一致：<b>t₃ = <span id="eqT">4.00</span> s，v₃ = <span id="eqV">−20.00</span> m/s</b>。
+    一般规律：<b>求「最高点、分段时间、分段路程」用分段法更直观；求「某时刻状态、落地时刻、落到抛出点下方」用全程法更省事。</b>
+  </div>
+</div>
+
+<!-- 5 要点 -->
+<div class="card">
+  <h2><span class="no">5</span>五个必须记住的要点</h2>
+  <ul class="tips">
+    <li><b>只受重力，a 恒为 g 竖直向下</b>——这是竖直上抛能被全程法处理的根本前提，上升、下降、最高点都一样。</li>
+    <li><b>最高点 v = 0，但 a = g ≠ 0</b>。速度为零不等于受力平衡。</li>
+    <li><b>时间对称</b>：t<sub>上</sub> = t<sub>下</sub> = v₀/g；<b>速度对称</b>：同一高度处上升与下落速率相等、方向相反。全程总时间（落回抛出点）为 2v₀/g。</li>
+    <li><b>位移 ≠ 路程</b>：落回抛出点时位移为 0，路程为 2H；用全程法算出来的 v、h 都带方向（正负号）。</li>
+    <li><b>先定正方向</b>再代公式。取向上为正时 a = −g；若取向下为正，则 v₀ 取负、a = +g，结果一致。</li>
+  </ul>
+</div>
+
+<!-- 6 练习 -->
+<div class="card">
+  <h2><span class="no">6</span>小测验（g 取 10 m/s²）</h2>
+
+  <div class="q">
+    <div class="qt">1. 以 30 m/s 的初速度竖直向上抛出一小球，小球上升的最大高度和所用时间分别是？</div>
+    <div class="opts">
+      <button class="opt" data-ok="1">A. 45 m，3 s</button>
+      <button class="opt">B. 90 m，3 s</button>
+      <button class="opt">C. 45 m，1.5 s</button>
+      <button class="opt">D. 30 m，3 s</button>
+    </div>
+    <div class="exp"><b>答案 A。</b>分段法/全程法都行：t₁ = v₀/g = 30/10 = 3 s；H = v₀²/(2g) = 900/20 = 45 m。（也可用 v² − v₀² = −2gh，最高点 v = 0 得 h = 45 m。）</div>
+  </div>
+
+  <div class="q">
+    <div class="qt">2. 小球到达最高点的瞬间，它的速度和加速度是？</div>
+    <div class="opts">
+      <button class="opt">A. 速度 0，加速度 0</button>
+      <button class="opt" data-ok="1">B. 速度 0，加速度大小为 g、方向竖直向下</button>
+      <button class="opt">C. 速度大小 g，加速度 0</button>
+      <button class="opt">D. 速度为 0，所以处于平衡状态</button>
+    </div>
+    <div class="exp"><b>答案 B。</b>最高点只是速度<b>瞬时</b>为零，小球始终只受重力，加速度恒为 g 竖直向下。若加速度也为 0，小球就会悬停在空中。</div>
+  </div>
+
+  <div class="q">
+    <div class="qt">3. 以 20 m/s 竖直上抛，抛出后 2.5 s 小球的速度为？（取向上为正）</div>
+    <div class="opts">
+      <button class="opt">A. +5 m/s（向上）</button>
+      <button class="opt" data-ok="1">B. −5 m/s（向下 5 m/s）</button>
+      <button class="opt">C. −45 m/s（向下）</button>
+      <button class="opt">D. +45 m/s（向上）</button>
+    </div>
+    <div class="exp"><b>答案 B。</b>全程法一步：v = v₀ − gt = 20 − 10×2.5 = −5 m/s，负号表示方向向下。此时小球已越过最高点（t₁ = 2 s）正在下落 0.5 s。</div>
+  </div>
+
+  <div class="q">
+    <div class="qt">4. 从距地面 20 m 的平台上以 15 m/s 竖直上抛一小石子，落地时速度大小为？</div>
+    <div class="opts">
+      <button class="opt">A. 15 m/s</button>
+      <button class="opt">B. 20 m/s</button>
+      <button class="opt" data-ok="1">C. 25 m/s</button>
+      <button class="opt">D. 35 m/s</button>
+    </div>
+    <div class="exp"><b>答案 C。</b>全程法：落地时位移 h = −20 m，由 v² − v₀² = −2gh 得 v² = 15² + 2×10×20 = 625，|v| = 25 m/s（方向向下）。<br>分段法验算：H = 15²/20 = 11.25 m，从最高点下落 11.25 + 20 = 31.25 m，v = √(2×10×31.25) = 25 m/s，✔ 一致。</div>
+  </div>
+</div>
+
+<footer>竖直上抛运动交互课件 · 拖动初速度、重力加速度与抛出点高度，观察两种解法的数值如何保持一致</footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(s){ return document.querySelector(s); };
+  var scene = $('#scene'), chH = $('#chartH'), chV = $('#chartV');
+
+  var S = { v0:20, g:10, h0:0, t:0, playing:true, speed:1, sym:true, trail:true, tr:[] };
+
+  function D(){
+    var v0=S.v0, g=S.g, h0=S.h0;
+    var t1 = v0/g;
+    var H  = v0*v0/(2*g);
+    var t2 = 2*v0/g;
+    var t3 = (v0 + Math.sqrt(v0*v0 + 2*g*h0))/g;
+    var v3 = v0 - g*t3;
+    return { t1:t1, H:H, t2:t2, t3:t3, v3:v3, Hg:h0+H };
+  }
+  function vAt(t){ return S.v0 - S.g*t; }
+  function hAt(t){ return S.v0*t - 0.5*S.g*t*t; }
+  function fmt(x,n){ if(n===undefined)n=2; if(Math.abs(x)<1e-9) x=0; return x.toFixed(n); }
+  function sign(x,n){ var s=fmt(Math.abs(x),n); return (x<0?'−':'')+s; }
+
+  /* ---------- canvas 基础 ---------- */
+  function fit(cv){
+    var dpr = window.devicePixelRatio || 1;
+    var w = cv.clientWidth, h = cv.clientHeight;
+    var W = Math.round(w*dpr), Hh = Math.round(h*dpr);
+    if(cv.width !== W || cv.height !== Hh){ cv.width = W; cv.height = Hh; }
+    var ctx = cv.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    return { ctx:ctx, w:w, h:h };
+  }
+  function arrow(ctx,x1,y1,x2,y2,color,w){
+    var a = Math.atan2(y2-y1, x2-x1), len = 9;
+    ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=w||2.5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-len*Math.cos(a-0.42), y2-len*Math.sin(a-0.42));
+    ctx.lineTo(x2-len*Math.cos(a+0.42), y2-len*Math.sin(a+0.42));
+    ctx.closePath(); ctx.fill();
+  }
+  function dblArrow(ctx,x,y1,y2,color){
+    ctx.strokeStyle=color; ctx.lineWidth=1.4; ctx.setLineDash([4,3]);
+    ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x,y2); ctx.stroke(); ctx.setLineDash([]);
+    if(Math.abs(y2-y1) < 14) return;
+    var mid=(y1+y2)/2;
+    arrow(ctx,x,y1,x,mid,color,1.4);
+    arrow(ctx,x,y2,x,mid,color,1.4);
+  }
+  function dash(ctx,x1,y1,x2,y2,color,pat){
+    ctx.strokeStyle=color; ctx.lineWidth=1; ctx.setLineDash(pat||[5,4]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); ctx.setLineDash([]);
+  }
+  function niceStep(range){
+    var raw = range/6, p = Math.pow(10, Math.floor(Math.log10(Math.max(raw,1e-6))));
+    var n = raw/p, m = n<1.5?1:(n<3?2:(n<7?5:10));
+    return m*p;
+  }
+  var FONT = '-apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+
+  /* ---------- 动画场景 ---------- */
+  function drawScene(){
+    var f = fit(scene), ctx=f.ctx, w=f.w, h=f.h;
+    var d = D(), t = S.t;
+    var v = vAt(t), hh = hAt(t);
+    if(t > d.t3){ t = d.t3; hh = -S.h0; v = d.v3; }
+
+    var topPad=52, botPad=56;
+    var yMin = -S.h0, yMax = d.Hg*1.10 + 0.6;
+    var usable = h - topPad - botPad;
+    var sc = usable/(yMax-yMin);
+    var X = Math.max(110, Math.min(w*0.30, 260));
+    function py(yy){ return topPad + (yMax-yy)*sc; }
+
+    // 竖直轨迹参考线
+    dash(ctx, X, py(d.H)-6, X, py(yMin), '#cbd5e1', [3,4]);
+
+    // 地面
+    var gy = py(-S.h0);
+    ctx.fillStyle='#eef2f7'; ctx.fillRect(0, gy, w, h-gy);
+    ctx.fillStyle='#dbe3ec'; ctx.fillRect(0, gy, w, 4);
+
+    // 高度标尺（右侧）
+    var rx = w - 76;
+    ctx.strokeStyle='#b6c0cd'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(rx, py(yMin)); ctx.lineTo(rx, py(yMax)); ctx.stroke();
+    var step = niceStep(d.Hg);
+    ctx.font='11px '+FONT; ctx.fillStyle='#64748b'; ctx.textAlign='left'; ctx.textBaseline='middle';
+    for(var m=0; m<=d.Hg+1e-6; m+=step){
+      var yy = py(-S.h0+m);
+      ctx.beginPath(); ctx.moveTo(rx-5, yy); ctx.lineTo(rx, yy); ctx.stroke();
+      ctx.fillText(fmt(m, step<1?1:0)+' m', rx+5, yy);
+    }
+    ctx.save(); ctx.translate(rx-30, (py(yMin)+py(d.Hg))/2); ctx.rotate(-Math.PI/2);
+    ctx.textAlign='center'; ctx.fillStyle='#94a3b8'; ctx.fillText('离地高度',0,0); ctx.restore();
+
+    // 抛出点
+    if(S.h0 > 0.05){
+      dash(ctx, 20, py(0), rx-14, py(0), '#7c8899', [6,4]);
+      ctx.font='11px '+FONT; ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillStyle='#64748b';
+      ctx.fillText('抛出点 h=0', 22, py(0)-4);
+    } else {
+      ctx.font='11px '+FONT; ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillStyle='#64748b';
+      ctx.fillText('抛出点（=地面）h=0', 22, gy-6);
+    }
+
+    // 最高点
+    var hy = py(d.H);
+    dash(ctx, 20, hy, rx-14, hy, '#e11d48', [6,4]);
+    ctx.font='12px '+FONT; ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillStyle='#e11d48';
+    ctx.fillText('最高点 H = '+fmt(d.H)+' m', 22, hy-4);
+
+    // 运动轨迹（拖影）
+    if(S.trail && S.tr.length>1){
+      for(var i=0;i<S.tr.length;i++){
+        var p=S.tr[i];
+        ctx.beginPath(); ctx.arc(X, py(p.y), 2.4, 0, 6.2832);
+        ctx.fillStyle = p.up ? 'rgba(249,115,22,.55)' : 'rgba(8,145,178,.55)';
+        ctx.fill();
+      }
+    }
+
+    // 分段法标注：上升高度 / 下落距离
+    var bx = X - 40;
+    if(t < d.t1){
+      dblArrow(ctx, bx, py(hh), py(0), '#f97316');
+      ctx.font='11px '+FONT; ctx.textAlign='right'; ctx.textBaseline='middle'; ctx.fillStyle='#f97316';
+      ctx.fillText('上升 '+fmt(hh)+' m', bx-6, (py(hh)+py(0))/2);
+    } else if(t <= d.t3){
+      dblArrow(ctx, bx, py(d.H), py(hh), '#0891b2');
+      ctx.font='11px '+FONT; ctx.textAlign='right'; ctx.textBaseline='middle'; ctx.fillStyle='#0891b2';
+      ctx.fillText('下落 '+fmt(d.H-hh)+' m', bx-6, (py(d.H)+py(hh))/2);
+    }
+
+    // 小球
+    var by = Math.min(py(hh), gy - 9);
+    var up = v > 1e-6, top = Math.abs(v) <= 1e-6;
+    ctx.beginPath(); ctx.arc(X, by, 9, 0, 6.2832);
+    ctx.fillStyle = up? '#f97316' : (top? '#e11d48' : '#0891b2'); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+
+    // 对称位置提示
+    if(S.sym && t>d.t1 && t<d.t2 && S.h0<0.05){
+      ctx.beginPath(); ctx.arc(X, by, 15, 0, 6.2832);
+      ctx.strokeStyle='rgba(249,115,22,.75)'; ctx.lineWidth=1.6; ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font='11px '+FONT; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillStyle='#c2410c';
+      ctx.fillText('上升路过此处：t′='+fmt(d.t2-t)+' s，v=+'+fmt(-v)+' m/s', X+22, by);
+    }
+
+    // 速度矢量
+    var vmax = Math.max(S.v0, Math.abs(d.v3));
+    var vsc = usable*0.30/Math.max(vmax,0.001);
+    var vlen = Math.abs(v)*vsc;
+    if(vlen > 2){
+      var vd = v>0 ? -1 : 1;
+      arrow(ctx, X, by, X, by + vd*vlen, '#2563eb', 3);
+      ctx.font='12px '+FONT; ctx.fillStyle='#1d4ed8'; ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText('v = '+sign(v)+' m/s'+(v>0?' ↑':(v<0?' ↓':'')), X+16, by + vd*vlen/2);
+    } else {
+      ctx.font='12px '+FONT; ctx.fillStyle='#e11d48'; ctx.textAlign='left'; ctx.textBaseline='middle';
+      ctx.fillText('v = 0', X+16, by-14);
+    }
+
+    // 加速度矢量（恒定）
+    var ax = X + 30;
+    arrow(ctx, ax, by-18, ax, by-18+38, '#e11d48', 3);
+    ctx.font='12px '+FONT; ctx.fillStyle='#e11d48'; ctx.textAlign='left'; ctx.textBaseline='top';
+    ctx.fillText('a = g = '+fmt(S.g)+' m/s² ↓', ax+8, by-22);
+
+    // 图例
+    ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font='11.5px '+FONT;
+    if(w > 430){
+      var lx = w-172, ly = 14;
+      var items=[['#2563eb','速度矢量 v'],['#e11d48','加速度 g（恒定向下）'],['#f97316','上升段'],['#0891b2','下落段']];
+      for(var k=0;k<items.length;k++){
+        ctx.fillStyle=items[k][0];
+        ctx.beginPath(); ctx.arc(lx+6, ly+k*17, 4, 0, 6.2832); ctx.fill();
+        ctx.fillStyle='#475569'; ctx.fillText(items[k][1], lx+16, ly+k*17);
+      }
+    }
+
+    // 阶段文字
+    ctx.font='13px '+FONT; ctx.textAlign='left'; ctx.textBaseline='top'; ctx.fillStyle='#334155';
+    var st = (t<d.t1-1e-6)? '上升中（匀减速，v 与 g 反向）'
+           : (Math.abs(t-d.t1)<=1e-6? '最高点（v = 0，a = g 向下）'
+           : (t<d.t3-1e-6? '下落中（自由落体，v 与 g 同向）' : '已落地'));
+    ctx.fillText(st, 20, 12);
+  }
+
+  /* ---------- 图表 ---------- */
+  function axes(ctx,w,h,pad,xmax,ymin,ymax,xlab,ylab){
+    var x0=pad.l, y0=h-pad.b, x1=w-pad.r, y1=pad.t;
+    ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x0,y0); ctx.lineTo(x1,y0); ctx.stroke();
+    ctx.font='10.5px '+FONT; ctx.fillStyle='#94a3b8';
+    ctx.textAlign='right'; ctx.textBaseline='top'; ctx.fillText(xlab, x1, y0+4);
+    ctx.textAlign='left'; ctx.textBaseline='bottom'; ctx.fillText(ylab, x0+2, y1-2);
+    return { x0:x0, y0:y0, x1:x1, y1:y1 };
+  }
+  function drawChartH(){
+    var f=fit(chH), ctx=f.ctx, w=f.w, h=f.h, d=D();
+    var pad={l:44,r:16,t:16,b:26};
+    var ymin=-S.h0*1.05-0.5, ymax=d.Hg*1.05+0.5;
+    var A=axes(ctx,w,h,pad,d.t3,ymin,ymax,'t / s','h / m');
+    var px=function(t){ return A.x0 + (t/d.t3)*(A.x1-A.x0); };
+    var py=function(y){ return A.y0 - (y-ymin)/(ymax-ymin)*(A.y0-A.y1); };
+
+    // 网格
+    ctx.font='10px '+FONT; ctx.fillStyle='#94a3b8'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    var st=niceStep(d.Hg);
+    for(var m=Math.ceil(ymin/st)*st; m<=ymax; m+=st){
+      var yy=py(m);
+      ctx.strokeStyle='#eef2f7'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(A.x0,yy); ctx.lineTo(A.x1,yy); ctx.stroke();
+      ctx.fillText(fmt(m,st<1?1:0), A.x0-4, yy);
+    }
+    // y=0 线
+    ctx.strokeStyle='#cbd5e1'; ctx.beginPath(); ctx.moveTo(A.x0,py(0)); ctx.lineTo(A.x1,py(0)); ctx.stroke();
+    // 最高点虚线
+    dash(ctx,A.x0,py(d.H),A.x1,py(d.H),'#e11d48',[5,4]);
+    // 曲线（两段着色）
+    var i,n=200;
+    ctx.lineWidth=2.4;
+    for(var seg=0;seg<2;seg++){
+      ctx.beginPath();
+      var ta = seg===0?0:d.t1, tb = seg===0?d.t1:d.t3;
+      for(i=0;i<=n;i++){
+        var tt = ta + (tb-ta)*i/n;
+        var xx=px(tt), yy2=py(hAt(tt));
+        if(i===0) ctx.moveTo(xx,yy2); else ctx.lineTo(xx,yy2);
+      }
+      ctx.strokeStyle = seg===0? '#f97316':'#0891b2'; ctx.stroke();
+    }
+    // t1 竖虚线
+    dash(ctx,px(d.t1),A.y0,px(d.t1),A.y1,'#94a3b8',[4,4]);
+    // 当前点
+    var cx=px(Math.min(S.t,d.t3)), cy=py(hAt(Math.min(S.t,d.t3)));
+    ctx.beginPath(); ctx.moveTo(cx,A.y0); ctx.lineTo(cx,A.y1); ctx.strokeStyle='rgba(37,99,235,.35)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,4.5,0,6.2832); ctx.fillStyle='#2563eb'; ctx.fill();
+    ctx.font='10.5px '+FONT; ctx.fillStyle='#1d4ed8'; ctx.textAlign='left'; ctx.textBaseline='bottom';
+    ctx.fillText('t='+fmt(S.t)+' s, h='+fmt(hAt(Math.min(S.t,d.t3)))+' m', Math.min(cx+6, A.x1-90), Math.max(cy-6, A.y1+12));
+    // x 刻度
+    ctx.fillStyle='#94a3b8'; ctx.textAlign='center'; ctx.textBaseline='top';
+    var tst=niceStep(d.t3);
+    for(var tt2=0; tt2<=d.t3+1e-9; tt2+=tst){
+      ctx.beginPath(); ctx.moveTo(px(tt2),A.y0); ctx.lineTo(px(tt2),A.y0+3); ctx.strokeStyle='#cbd5e1'; ctx.stroke();
+      ctx.fillText(fmt(tt2, tst<1?1:0), px(tt2), A.y0+5);
+    }
+  }
+  function drawChartV(){
+    var f=fit(chV), ctx=f.ctx, w=f.w, h=f.h, d=D();
+    var pad={l:44,r:16,t:16,b:26};
+    var vmin=-Math.max(Math.abs(d.v3),1)*1.08, vmax=S.v0*1.08+0.5;
+    var A=axes(ctx,w,h,pad,d.t3,vmin,vmax,'t / s','v / (m·s⁻¹)');
+    var px=function(t){ return A.x0 + (t/d.t3)*(A.x1-A.x0); };
+    var py=function(v){ return A.y0 - (v-vmin)/(vmax-vmin)*(A.y0-A.y1); };
+    ctx.strokeStyle='#eef2f7';
+    var st=niceStep(vmax-vmin);
+    ctx.font='10px '+FONT; ctx.fillStyle='#94a3b8'; ctx.textAlign='right'; ctx.textBaseline='middle';
+    for(var m=Math.ceil(vmin/st)*st; m<=vmax; m+=st){
+      var yy=py(m);
+      ctx.beginPath(); ctx.moveTo(A.x0,yy); ctx.lineTo(A.x1,yy); ctx.stroke();
+      ctx.fillText(fmt(m,st<1?1:0), A.x0-4, yy);
+    }
+    ctx.strokeStyle='#94a3b8'; ctx.lineWidth=1.4;
+    ctx.beginPath(); ctx.moveTo(A.x0,py(0)); ctx.lineTo(A.x1,py(0)); ctx.stroke();
+    ctx.font='10px '+FONT; ctx.fillStyle='#475569'; ctx.textAlign='left'; ctx.textBaseline='bottom';
+    ctx.fillText('v=0（最高点）', A.x0+4, py(0)-3);
+
+    // 直线
+    ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.4;
+    ctx.beginPath(); ctx.moveTo(px(0),py(S.v0)); ctx.lineTo(px(d.t3),py(d.v3)); ctx.stroke();
+    // 关键点竖线
+    dash(ctx,px(d.t1),py(S.v0),px(d.t1),py(Math.min(d.v3,0)),'#e11d48',[4,4]);
+    if(S.h0>0.05) dash(ctx,px(d.t2),py(0),px(d.t2),py(d.v3),'#94a3b8',[4,4]);
+    dash(ctx,px(d.t3),A.y0,px(d.t3),py(d.v3),'#94a3b8',[4,4]);
+    // 当前点
+    var tc=Math.min(S.t,d.t3), cx=px(tc), cy=py(vAt(tc));
+    ctx.strokeStyle='rgba(37,99,235,.35)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx,A.y0); ctx.lineTo(cx,A.y1); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,4.5,0,6.2832); ctx.fillStyle='#2563eb'; ctx.fill();
+    ctx.font='10.5px '+FONT; ctx.fillStyle='#1d4ed8'; ctx.textAlign='left'; ctx.textBaseline='bottom';
+    ctx.fillText('v='+sign(vAt(tc))+' m/s', Math.min(cx+6, A.x1-70), Math.max(cy-6, A.y1+12));
+    // 标注 t1 / t3
+    ctx.fillStyle='#e11d48'; ctx.textAlign='center'; ctx.textBaseline='top';
+    ctx.fillText('t₁='+fmt(d.t1)+'s', px(d.t1), A.y0+5);
+    ctx.fillStyle='#64748b';
+    ctx.fillText('t₃='+fmt(d.t3)+'s', px(d.t3)-14, A.y0+5);
+  }
+
+  /* ---------- 数据 / 文本更新 ---------- */
+  function setText(id,val){ var e=document.getElementById(id); if(e) e.textContent=val; }
+
+  function updateTable(){
+    var d=D();
+    setText('dT1', fmt(d.t1)+' s');
+    setText('dH',  fmt(d.H)+' m');
+    setText('dHg', fmt(d.Hg)+' m');
+    setText('dT2', fmt(d.t2)+' s');
+    setText('dV2', '−'+fmt(S.v0)+' m/s');
+    setText('dT3', fmt(d.t3)+' s');
+    setText('dV3', sign(d.v3)+' m/s');
+    setText('dS',  fmt(2*d.H + S.h0)+' m');
+  }
+
+  function updateTheory(){
+    var d=D(), t=Math.min(S.t,d.t3);
+    var v=vAt(t), hh=hAt(t);
+    // 全程法
+    setText('aT', fmt(t));
+    setText('aVexp', fmt(S.v0,1)+' − '+fmt(S.g,1)+'×'+fmt(t));
+    setText('aV', sign(v));
+    setText('aHexp', fmt(S.v0,1)+'×'+fmt(t)+' − '+fmt(S.g/2,1)+'×'+fmt(t)+'²');
+    setText('aH', sign(hh));
+    // 分段法
+    setText('bT', fmt(t));
+    setText('bT1', fmt(d.t1));
+    setText('bH', fmt(d.H));
+    var stageEl = document.getElementById('bStage');
+    if(t < d.t1 - 1e-6){
+      stageEl.className='tag up'; stageEl.textContent='上升中';
+      setText('bK1','已上升时间 t'); setText('bTk', fmt(t));
+      setText('bK2','上升高度 h↑ = v₀t − ½gt²'); setText('bHk', fmt(hh));
+    } else if(Math.abs(t-d.t1)<=1e-6){
+      stageEl.className='tag top'; stageEl.textContent='最高点';
+      setText('bK1','已上升时间 t₁'); setText('bTk', fmt(d.t1));
+      setText('bK2','上升高度 h↑ = H'); setText('bHk', fmt(d.H));
+    } else {
+      stageEl.className='tag down'; stageEl.textContent='下落中';
+      setText('bK1','已下落时间 t − t₁'); setText('bTk', fmt(t-d.t1));
+      setText('bK2','下落距离 h↓ = ½g(t−t₁)²'); setText('bHk', fmt(d.H-hh));
+    }
+    setText('bHv', sign(hh));
+    // 对比区（静态参数代入）
+    setText('c1a', fmt(S.v0,1)); setText('c1b', fmt(S.v0*S.v0,1));
+    setText('c1c', fmt(2*S.g*S.h0,1)); setText('c1d', fmt(S.g,1));
+    setText('c1r', fmt(d.t3));
+    setText('c2a', fmt(S.v0*S.v0,1)); setText('c2b', fmt(2*S.g*S.h0,1));
+    setText('c2r', sign(d.v3));
+    setText('c3a', fmt(S.v0,1)); setText('c3b', fmt(S.g,1)); setText('c3c', fmt(d.H));
+    setText('c3r', fmt(d.t1));
+    setText('c4a', fmt(d.H)); setText('c4b', fmt(S.h0,1)); setText('c4c', fmt(S.g,1));
+    var t2f = Math.sqrt(2*(d.H+S.h0)/S.g);
+    setText('c4r', fmt(t2f));
+    setText('c5r', fmt(d.t1+t2f));
+    setText('c6r', sign(-S.g*t2f));
+    setText('eqT', fmt(d.t3)); setText('eqV', sign(d.v3));
+  }
+
+  function updateReadout(){
+    var d=D(), t=Math.min(S.t,d.t3);
+    var v=vAt(t), hh=hAt(t);
+    var s = (t<=d.t1)? hh : (2*d.H - hh);
+    setText('roT', fmt(t));
+    setText('roV', sign(v));
+    setText('roH', sign(hh));
+    setText('roG', fmt(Math.max(hh+S.h0,0)));
+    setText('roS', fmt(s));
+    var el=document.getElementById('roStage');
+    if(t<d.t1-1e-6){ el.className='tag up'; el.textContent='上升中'; }
+    else if(Math.abs(t-d.t1)<=1e-6){ el.className='tag top'; el.textContent='最高点'; }
+    else if(t<d.t3-1e-6){ el.className='tag down'; el.textContent='下落中'; }
+    else { el.className='tag land'; el.textContent='已落地'; }
+    setText('vT','t = '+fmt(t)+' s');
+  }
+
+  function updateAll(){
+    drawScene(); drawChartH(); drawChartV();
+    updateReadout(); updateTheory();
+  }
+
+  /* ---------- 轨迹采样 ---------- */
+  function rebuildTrail(){
+    S.tr.length = 0;
+    var tEnd = Math.min(S.t, D().t3);
+    var n = Math.min(120, Math.max(2, Math.round(tEnd/0.02)));
+    for(var i=0;i<=n;i++){
+      var tt = tEnd*i/n;
+      S.tr.push({ y:hAt(tt), up: vAt(tt) > 0 });
+    }
+  }
+  var lastTrailT = -1;
+  function pushTrail(){
+    var t=Math.min(S.t, D().t3);
+    if(t - lastTrailT < 0.016 && lastTrailT >= 0) return;
+    lastTrailT = t;
+    S.tr.push({ y:hAt(t), up: vAt(t)>0 });
+    if(S.tr.length>600) S.tr.shift();
+  }
+
+  /* ---------- 交互 ---------- */
+  function setT(t, rebuild){
+    S.t = Math.max(0, Math.min(t, D().t3));
+    $('#sT').value = S.t;
+    if(rebuild) rebuildTrail();
+    updateAll();
+  }
+  function syncPlayBtn(){ $('#btnPlay').textContent = S.playing? '⏸ 暂停' : '▶ 播放'; }
+
+  $('#sV0').addEventListener('input', function(){ S.v0=parseFloat(this.value); $('#vV0').textContent=fmt(S.v0,1)+' m/s'; reset(true); });
+  $('#sG').addEventListener('input',  function(){ S.g =parseFloat(this.value); $('#vG').textContent =fmt(S.g,1)+' m/s²'; reset(true); });
+  $('#sH0').addEventListener('input', function(){ S.h0=parseFloat(this.value); $('#vH0').textContent=fmt(S.h0,1)+' m'; reset(true); });
+  $('#sT').addEventListener('input', function(){ S.playing=false; syncPlayBtn(); setT(parseFloat(this.value), true); });
+
+  $('#btnPlay').addEventListener('click', function(){
+    if(!S.playing && S.t >= D().t3-1e-6) { S.t=0; rebuildTrail(); }
+    S.playing = !S.playing; syncPlayBtn();
+  });
+  $('#btnReset').addEventListener('click', function(){ reset(true); S.playing=true; syncPlayBtn(); });
+  $('#selSpeed').addEventListener('change', function(){ S.speed=parseFloat(this.value); });
+  $('#btnTop').addEventListener('click', function(){ pause(); setT(D().t1, true); });
+  $('#btnBack').addEventListener('click', function(){ pause(); setT(D().t2, true); });
+  $('#btnLand').addEventListener('click', function(){ pause(); setT(D().t3, true); });
+  $('#ckSym').addEventListener('change', function(){ S.sym=this.checked; drawScene(); });
+  $('#ckTrail').addEventListener('change', function(){ S.trail=this.checked; drawScene(); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-g]'), function(b){
+    b.addEventListener('click', function(){
+      S.g=parseFloat(b.getAttribute('data-g'));
+      $('#sG').value=S.g; $('#vG').textContent=fmt(S.g,1)+' m/s²'; reset(true);
+    });
+  });
+  function pause(){ S.playing=false; syncPlayBtn(); }
+  function reset(){
+    S.t=0; S.tr.length=0; lastTrailT=-1;
+    var sl=$('#sT');
+    sl.setAttribute('max', D().t3);
+    sl.value = 0;
+    updateTable(); updateAll();
+  }
+
+  // 练习
+  Array.prototype.forEach.call(document.querySelectorAll('.opts'), function(box){
+    box.addEventListener('click', function(e){
+      var b=e.target.closest('.opt'); if(!b) return;
+      var ok = b.getAttribute('data-ok')==='1';
+      Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(x){
+        x.classList.remove('ok','no'); x.disabled=true;
+      });
+      b.classList.add(ok?'ok':'no');
+      if(!ok){ Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(x){
+        if(x.getAttribute('data-ok')==='1') x.classList.add('ok');
+      }); }
+      box.parentElement.querySelector('.exp').classList.add('show');
+    });
+  });
+
+  window.addEventListener('resize', function(){ drawScene(); drawChartH(); drawChartV(); });
+
+  /* ---------- 主循环 ---------- */
+  var last=0;
+  function loop(ts){
+    if(!last) last=ts;
+    var dt=Math.min(0.05,(ts-last)/1000); last=ts;
+    if(S.playing){
+      var d=D();
+      S.t += dt*S.speed;
+      if(S.t >= d.t3){ S.t = d.t3; S.playing=false; syncPlayBtn(); }
+      pushTrail();
+      $('#sT').value = S.t;
+      updateAll();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // 初始化
+  $('#vV0').textContent=fmt(S.v0,1)+' m/s';
+  $('#vG').textContent=fmt(S.g,1)+' m/s²';
+  $('#vH0').textContent=fmt(S.h0,1)+' m';
+  $('#sT').setAttribute('max', D().t3);
+  updateTable(); updateAll();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
