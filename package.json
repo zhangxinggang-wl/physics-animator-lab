@@ -1,0 +1,7 @@
+{
+  "name": "physics-animator-lab",
+  "dependencies": {
+    "katex": "^0.18.7",
+    "playwright-core": "^1.63.0"
+  }
+}

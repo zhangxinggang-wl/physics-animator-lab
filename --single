@@ -1,0 +1,28 @@
+mjx-container = 11 (stable>=6, error=0)
+distinctFrames = 8
+
+=== 门禁 ===
+PASS  mjx-error=0  →  0
+PASS  merror=0  →  0
+PASS  无裸定界符  →  0
+PASS  无 <select>  →  0
+PASS  画布非白像素>0  →  102067
+PASS  题图已移除  →  0
+PASS  解析栏已移除  →  -1
+PASS  distinctFrames>=5  →  8
+PASS  四宽度零溢出  →  [0,0,0,0]
+PASS  四宽度画布有内容  →  [30021,30021,30021,30021]
+PASS  零控制台/页面报错  →  {"consoleErrors":[],"pageErrors":[]}
+PASS  四宽度零报错  →  [[],[],[],[]]
+PASS  首帧 banner 非空  →  21942
+PASS  首帧 hud 非空  →  42267
+PASS  首帧 legend 非空  →  22115
+PASS  首帧 middle 非空  →  38957
+PASS  单栏：列数=1  →  1
+PASS  单栏：画布 CSS 宽 680  →  680
+PASS  单栏：画布内宽 678  →  678
+PASS  单栏：kpToggle 已删  →  0
+
+zones(首帧) = {"banner":21942,"hud":42267,"legend":22115,"middle":38957}
+canvas css = 680x449 dpr=2
+widths = [{"width":1280,"texOverflow":0,"analysisScroll":-1,"mjxError":0,"animPx":30021,"errors":[]},{"width":1366,"texOverflow":0,"analysisScroll":-1,"mjxError":0,"animPx":30021,"errors":[]},{"width":1600,"texOverflow":0,"analysisScroll":-1,"mjxError":0,"animPx":30021,"errors":[]},{"width":1920,"texOverflow":0,"analysisScroll":-1,"mjxError":0,"animPx":30021,"errors":[]}]
