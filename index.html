@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>高中物理试题动画演示库</title>
+<style>
+:root{--bg:#f6f7f9;--fg:#1f2328;--mut:#6b7280;--line:#e4e7ec;--acc:#2f6feb}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:"Microsoft YaHei","微软雅黑","PingFang SC","Hiragino Sans GB",system-ui,sans-serif;
+line-height:1.6}
+header{background:linear-gradient(135deg,#2f6feb,#1a4fb8);color:#fff;padding:34px 20px 28px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{margin:0 0 8px;font-size:26px;font-weight:600;letter-spacing:.5px}
+.sub{opacity:.9;font-size:14px}
+.stat{margin-top:14px;font-size:14px;opacity:.95}
+.stat b{font-size:19px;padding:0 3px}
+.bar{position:sticky;top:0;z-index:9;background:rgba(246,247,249,.96);
+backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 20px}
+.bar .wrap{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#q{flex:1;min-width:200px;padding:9px 13px;border:1px solid var(--line);border-radius:8px;
+font-size:14px;outline:none;background:#fff}
+#q:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(47,111,235,.12)}
+.yb{padding:7px 13px;border:1px solid var(--line);background:#fff;border-radius:7px;
+font-size:13px;cursor:pointer;color:var(--mut)}
+.yb:hover{border-color:var(--acc);color:var(--acc)}
+.yb.on{background:var(--acc);border-color:var(--acc);color:#fff}
+main{padding:22px 20px 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:13px}
+.card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:14px 15px;
+transition:.18s;display:flex;flex-direction:column;gap:9px}
+.card:hover{box-shadow:0 5px 18px rgba(20,40,90,.09);transform:translateY(-1px);
+border-color:#cfd8e6}
+.no{font-size:12px;color:var(--mut);font-weight:600;letter-spacing:.4px}
+.tt{font-size:15px;font-weight:600;flex:1}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns a{flex:1;text-align:center;text-decoration:none;padding:7px 10px;border-radius:7px;
+font-size:13px;font-weight:600;white-space:nowrap}
+.b1{background:var(--acc);color:#fff}
+.b1:hover{background:#1a4fb8}
+.b2{background:#eaf1ff;color:#1a4fb8}
+.b2:hover{background:#dbe7ff}
+footer{border-top:1px solid var(--line);padding:20px;text-align:center;
+font-size:12px;color:var(--mut)}
+.empty{text-align:center;color:var(--mut);padding:40px 0;display:none}
+@media(max-width:520px){h1{font-size:21px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>高中物理试题动画演示库</h1>
+<div class="sub">单文件 HTML · 无广告无外链 · 点击即播，支持手机与电脑</div>
+<div class="stat">共 <b>76</b> 道试题 · <b>146</b> 个动画（动画演示 / 教学动画两种版本）</div>
+</div></header>
+<div class="bar"><div class="wrap">
+<input id="q" type="search" placeholder="搜索题号、省份或考点，例如：2024 湖南、磁场、回旋加速器">
+<button class="yb on" data-y="all">全部</button>
+<button class="yb" data-y="2007">2007</button><button class="yb" data-y="2009">2009</button><button class="yb" data-y="2010">2010</button><button class="yb" data-y="2011">2011</button><button class="yb" data-y="2013">2013</button><button class="yb" data-y="2014">2014</button><button class="yb" data-y="2015">2015</button><button class="yb" data-y="2016">2016</button><button class="yb" data-y="2017">2017</button><button class="yb" data-y="2019">2019</button><button class="yb" data-y="2020">2020</button><button class="yb" data-y="2021">2021</button><button class="yb" data-y="2022">2022</button><button class="yb" data-y="2023">2023</button><button class="yb" data-y="2024">2024</button><button class="yb" data-y="2025">2025</button><button class="yb" data-y="2026">2026</button>
+</div></div>
+<main><div class="wrap">
+<div class="grid" id="grid">
+<div class="card" data-k=" " data-y="其他"><div class="no"></div><div class="tt"></div><div class="btns"><a class="b2" href="_x3.html">x3</a><a class="b2" href="_x4.html">x4</a><a class="b2" href="_y1.html">y1</a><a class="b2" href="_z1.html">z1</a></div></div>
+<div class="card" data-k="vertical-throw vertical-throw" data-y="其他"><div class="no">vertical-throw</div><div class="tt">vertical-throw</div><div class="btns"><a class="b2" href="vertical-throw.html">动画</a></div></div>
+<div class="card" data-k="带电粒子组合场运动演示 带电粒子组合场运动演示" data-y="其他"><div class="no">带电粒子组合场运动演示</div><div class="tt">带电粒子组合场运动演示</div><div class="btns"><a class="b2" href="带电粒子组合场运动演示_2013安徽理综23题.html">2013安徽理综23题</a></div></div>
+<div class="card" data-k="瞬时速度极限逼近交互仿真 瞬时速度极限逼近交互仿真" data-y="其他"><div class="no">瞬时速度极限逼近交互仿真</div><div class="tt">瞬时速度极限逼近交互仿真</div><div class="btns"><a class="b2" href="瞬时速度极限逼近交互仿真.html">动画</a></div></div>
+<div class="card" data-k="2007广东17_斜面弹簧弹射碰撞 斜面弹簧弹射碰撞" data-y="2007"><div class="no">2007广东17</div><div class="tt">斜面弹簧弹射碰撞</div><div class="btns"><a class="b1" href="2007广东17_斜面弹簧弹射碰撞_动画演示.html">动画演示</a><a class="b2" href="2007广东17_斜面弹簧弹射碰撞_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2009北京24_多球依次碰撞 多球依次碰撞" data-y="2009"><div class="no">2009北京24</div><div class="tt">多球依次碰撞</div><div class="btns"><a class="b2" href="2009北京24_多球依次碰撞_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2010四川25_竖直电场摆球碰撞 竖直电场摆球碰撞" data-y="2010"><div class="no">2010四川25</div><div class="tt">竖直电场摆球碰撞</div><div class="btns"><a class="b1" href="2010四川25_竖直电场摆球碰撞_动画演示.html">动画演示</a><a class="b2" href="2010四川25_竖直电场摆球碰撞_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2011福建22_正交电磁场 正交电磁场" data-y="2011"><div class="no">2011福建22</div><div class="tt">正交电磁场</div><div class="btns"><a class="b1" href="2011福建22_正交电磁场_动画演示.html">动画演示</a><a class="b2" href="2011福建22_正交电磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2011重庆25_电场隔离层磁场 电场隔离层磁场" data-y="2011"><div class="no">2011重庆25</div><div class="tt">电场隔离层磁场</div><div class="btns"><a class="b1" href="2011重庆25_电场隔离层磁场_动画演示.html">动画演示</a><a class="b2" href="2011重庆25_电场隔离层磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2013天津11_圆筒内磁场碰撞 圆筒内磁场碰撞" data-y="2013"><div class="no">2013天津11</div><div class="tt">圆筒内磁场碰撞</div><div class="btns"><a class="b1" href="2013天津11_圆筒内磁场碰撞_动画演示.html">动画演示</a><a class="b2" href="2013天津11_圆筒内磁场碰撞_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2014天津12_同步加速器 同步加速器" data-y="2014"><div class="no">2014天津12</div><div class="tt">同步加速器</div><div class="btns"><a class="b1" href="2014天津12_同步加速器_动画演示.html">动画演示</a><a class="b2" href="2014天津12_同步加速器_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2014海南14_复合场粒子运动 复合场粒子运动" data-y="2014"><div class="no">2014海南14</div><div class="tt">复合场粒子运动</div><div class="btns"><a class="b1" href="2014海南14_复合场粒子运动_动画演示.html">动画演示</a><a class="b2" href="2014海南14_复合场粒子运动_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2015天津12_多层电磁场 多层电磁场" data-y="2015"><div class="no">2015天津12</div><div class="tt">多层电磁场</div><div class="btns"><a class="b1" href="2015天津12_多层电磁场_动画演示.html">动画演示</a><a class="b2" href="2015天津12_多层电磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2015江苏15_质谱仪 质谱仪" data-y="2015"><div class="no">2015江苏15</div><div class="tt">质谱仪</div><div class="btns"><a class="b1" href="2015江苏15_质谱仪_动画演示.html">动画演示</a><a class="b2" href="2015江苏15_质谱仪_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2016浙江25_扇形聚焦回旋加速器 扇形聚焦回旋加速器" data-y="2016"><div class="no">2016浙江25</div><div class="tt">扇形聚焦回旋加速器</div><div class="btns"><a class="b1" href="2016浙江25_扇形聚焦回旋加速器_动画演示.html">动画演示</a><a class="b2" href="2016浙江25_扇形聚焦回旋加速器_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2016浙江4月21_双缝干涉测波长 双缝干涉测波长" data-y="2016"><div class="no">2016浙江4月21</div><div class="tt">双缝干涉测波长</div><div class="btns"><a class="b1" href="2016浙江4月21_双缝干涉测波长_动画演示.html">动画演示</a><a class="b2" href="2016浙江4月21_双缝干涉测波长_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2017新课标ⅲ24_两区磁场半圆 两区磁场半圆" data-y="2017"><div class="no">2017新课标Ⅲ24</div><div class="tt">两区磁场半圆</div><div class="btns"><a class="b1" href="2017新课标Ⅲ24_两区磁场半圆_动画演示.html">动画演示</a><a class="b2" href="2017新课标Ⅲ24_两区磁场半圆_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2017旧课标25_两球穿过水平匀强电场 两球穿过水平匀强电场" data-y="2017"><div class="no">2017旧课标25</div><div class="tt">两球穿过水平匀强电场</div><div class="btns"><a class="b1" href="2017旧课标25_两球穿过水平匀强电场_动画演示.html">动画演示</a><a class="b2" href="2017旧课标25_两球穿过水平匀强电场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2019江苏16_磁场碰板反弹_p到q 磁场碰板反弹 p到q" data-y="2019"><div class="no">2019江苏16</div><div class="tt">磁场碰板反弹 P到Q</div><div class="btns"><a class="b1" href="2019江苏16_磁场碰板反弹_P到Q_动画演示.html">动画演示</a><a class="b2" href="2019江苏16_磁场碰板反弹_P到Q_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2019浙江4月23_质谱仪 质谱仪" data-y="2019"><div class="no">2019浙江4月23</div><div class="tt">质谱仪</div><div class="btns"><a class="b1" href="2019浙江4月23_质谱仪_动画演示.html">动画演示</a><a class="b2" href="2019浙江4月23_质谱仪_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2020山东17_质谱仪 质谱仪" data-y="2020"><div class="no">2020山东17</div><div class="tt">质谱仪</div><div class="btns"><a class="b1" href="2020山东17_质谱仪_动画演示.html">动画演示</a><a class="b2" href="2020山东17_质谱仪_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2020浙江7月22_离子诊断测量装置 离子诊断测量装置" data-y="2020"><div class="no">2020浙江7月22</div><div class="tt">离子诊断测量装置</div><div class="btns"><a class="b1" href="2020浙江7月22_离子诊断测量装置_动画演示.html">动画演示</a><a class="b2" href="2020浙江7月22_离子诊断测量装置_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2020海南18_三角形磁场离子回归 三角形磁场离子回归" data-y="2020"><div class="no">2020海南18</div><div class="tt">三角形磁场离子回归</div><div class="btns"><a class="b1" href="2020海南18_三角形磁场离子回归_动画演示.html">动画演示</a><a class="b2" href="2020海南18_三角形磁场离子回归_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2021全国甲25_电场平抛磁场偏转 电场平抛磁场偏转" data-y="2021"><div class="no">2021全国甲25</div><div class="tt">电场平抛磁场偏转</div><div class="btns"><a class="b1" href="2021全国甲25_电场平抛磁场偏转_动画演示.html">动画演示</a><a class="b2" href="2021全国甲25_电场平抛磁场偏转_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2021山东17_离子束实验装置 离子束实验装置" data-y="2021"><div class="no">2021山东17</div><div class="tt">离子束实验装置</div><div class="btns"><a class="b1" href="2021山东17_离子束实验装置_动画演示.html">动画演示</a><a class="b2" href="2021山东17_离子束实验装置_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2021广东14_花瓣形电子加速器 花瓣形电子加速器" data-y="2021"><div class="no">2021广东14</div><div class="tt">花瓣形电子加速器</div><div class="btns"><a class="b1" href="2021广东14_花瓣形电子加速器_动画演示.html">动画演示</a><a class="b2" href="2021广东14_花瓣形电子加速器_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2021浙江6月22_离子推进器 离子推进器" data-y="2021"><div class="no">2021浙江6月22</div><div class="tt">离子推进器</div><div class="btns"><a class="b1" href="2021浙江6月22_离子推进器_动画演示.html">动画演示</a><a class="b2" href="2021浙江6月22_离子推进器_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2021湖南13_磁聚焦与磁控束 磁聚焦与磁控束" data-y="2021"><div class="no">2021湖南13</div><div class="tt">磁聚焦与磁控束</div><div class="btns"><a class="b1" href="2021湖南13_磁聚焦与磁控束_动画演示.html">动画演示</a><a class="b2" href="2021湖南13_磁聚焦与磁控束_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2021辽宁15_电场加速弹性正碰电量转移 电场加速弹性正碰电量转移" data-y="2021"><div class="no">2021辽宁15</div><div class="tt">电场加速弹性正碰电量转移</div><div class="btns"><a class="b1" href="2021辽宁15_电场加速弹性正碰电量转移_动画演示.html">动画演示</a><a class="b2" href="2021辽宁15_电场加速弹性正碰电量转移_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2022全国乙25_弹簧碰撞与斜面往返 弹簧碰撞与斜面往返" data-y="2022"><div class="no">2022全国乙25</div><div class="tt">弹簧碰撞与斜面往返</div><div class="btns"><a class="b1" href="2022全国乙25_弹簧碰撞与斜面往返_动画演示.html">动画演示</a><a class="b2" href="2022全国乙25_弹簧碰撞与斜面往返_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2022山东17_人造太阳 人造太阳" data-y="2022"><div class="no">2022山东17</div><div class="tt">人造太阳</div><div class="btns"><a class="b2" href="2022山东17_人造太阳_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2022江苏15_多层交变电场 多层交变电场" data-y="2022"><div class="no">2022江苏15</div><div class="tt">多层交变电场</div><div class="btns"><a class="b1" href="2022江苏15_多层交变电场_动画演示.html">动画演示</a><a class="b2" href="2022江苏15_多层交变电场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2023山东17_方形电场区外围磁场 方形电场区外围磁场" data-y="2023"><div class="no">2023山东17</div><div class="tt">方形电场区外围磁场</div><div class="btns"><a class="b1" href="2023山东17_方形电场区外围磁场_动画演示.html">动画演示</a><a class="b2" href="2023山东17_方形电场区外围磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2023江苏16_霍耳推进器摆线 霍耳推进器摆线" data-y="2023"><div class="no">2023江苏16</div><div class="tt">霍耳推进器摆线</div><div class="btns"><a class="b1" href="2023江苏16_霍耳推进器摆线_动画演示.html">动画演示</a><a class="b2" href="2023江苏16_霍耳推进器摆线_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2023湖北15_磁场多次弹性正碰 磁场多次弹性正碰" data-y="2023"><div class="no">2023湖北15</div><div class="tt">磁场多次弹性正碰</div><div class="btns"><a class="b1" href="2023湖北15_磁场多次弹性正碰_动画演示.html">动画演示</a><a class="b2" href="2023湖北15_磁场多次弹性正碰_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2023重庆15_粒子加速器理想模型 粒子加速器理想模型" data-y="2023"><div class="no">2023重庆15</div><div class="tt">粒子加速器理想模型</div><div class="btns"><a class="b1" href="2023重庆15_粒子加速器理想模型_动画演示.html">动画演示</a><a class="b2" href="2023重庆15_粒子加速器理想模型_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024安徽14_弧轨道碰撞 弧轨道碰撞" data-y="2024"><div class="no">2024安徽14</div><div class="tt">弧轨道碰撞</div><div class="btns"><a class="b1" href="2024安徽14_弧轨道碰撞_动画演示.html">动画演示</a><a class="b2" href="2024安徽14_弧轨道碰撞_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024广东15_交变电压平行板与磁场 交变电压平行板与磁场" data-y="2024"><div class="no">2024广东15</div><div class="tt">交变电压平行板与磁场</div><div class="btns"><a class="b1" href="2024广东15_交变电压平行板与磁场_动画演示.html">动画演示</a><a class="b2" href="2024广东15_交变电压平行板与磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024新课标26_速度空间闭合曲线 速度空间闭合曲线" data-y="2024"><div class="no">2024新课标26</div><div class="tt">速度空间闭合曲线</div><div class="btns"><a class="b1" href="2024新课标26_速度空间闭合曲线_动画演示.html">动画演示</a><a class="b2" href="2024新课标26_速度空间闭合曲线_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024江苏16_半圆环磁场插入体 半圆环磁场插入体" data-y="2024"><div class="no">2024江苏16</div><div class="tt">半圆环磁场插入体</div><div class="btns"><a class="b1" href="2024江苏16_半圆环磁场插入体_动画演示.html">动画演示</a><a class="b2" href="2024江苏16_半圆环磁场插入体_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024浙江1月22_磁场反射电场折射 磁场反射电场折射" data-y="2024"><div class="no">2024浙江1月22</div><div class="tt">磁场反射电场折射</div><div class="btns"><a class="b1" href="2024浙江1月22_磁场反射电场折射_动画演示.html">动画演示</a><a class="b2" href="2024浙江1月22_磁场反射电场折射_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024海南19_三区域磁场与摆线 三区域磁场与摆线" data-y="2024"><div class="no">2024海南19</div><div class="tt">三区域磁场与摆线</div><div class="btns"><a class="b1" href="2024海南19_三区域磁场与摆线_动画演示.html">动画演示</a><a class="b2" href="2024海南19_三区域磁场与摆线_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2024湖北7_圆形磁场区内外往返 圆形磁场区内外往返" data-y="2024"><div class="no">2024湖北7</div><div class="tt">圆形磁场区内外往返</div><div class="btns"><a class="b1" href="2024湖北7_圆形磁场区内外往返_动画演示.html">动画演示</a><a class="b2" href="2024湖北7_圆形磁场区内外往返_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2025四川15_斜面半圆挡板碰撞 斜面半圆挡板碰撞" data-y="2025"><div class="no">2025四川15</div><div class="tt">斜面半圆挡板碰撞</div><div class="btns"><a class="b1" href="2025四川15_斜面半圆挡板碰撞_动画演示.html">动画演示</a><a class="b2" href="2025四川15_斜面半圆挡板碰撞_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2025河北15_电磁助推装置 电磁助推装置" data-y="2025"><div class="no">2025河北15</div><div class="tt">电磁助推装置</div><div class="btns"><a class="b1" href="2025河北15_电磁助推装置_动画演示.html">动画演示</a><a class="b2" href="2025河北15_电磁助推装置_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2025贵州15_电磁复合场分区圆周 电磁复合场分区圆周" data-y="2025"><div class="no">2025贵州15</div><div class="tt">电磁复合场分区圆周</div><div class="btns"><a class="b1" href="2025贵州15_电磁复合场分区圆周_动画演示.html">动画演示</a><a class="b2" href="2025贵州15_电磁复合场分区圆周_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2025辽吉黑内15_磁场圆弧与点电荷椭圆轨道 磁场圆弧与点电荷椭圆轨道" data-y="2025"><div class="no">2025辽吉黑内15</div><div class="tt">磁场圆弧与点电荷椭圆轨道</div><div class="btns"><a class="b2" href="2025辽吉黑内15_磁场圆弧与点电荷椭圆轨道_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2025重庆14_荧光屏测速装置 荧光屏测速装置" data-y="2025"><div class="no">2025重庆14</div><div class="tt">荧光屏测速装置</div><div class="btns"><a class="b1" href="2025重庆14_荧光屏测速装置_动画演示.html">动画演示</a><a class="b2" href="2025重庆14_荧光屏测速装置_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-09-13_自行车气门芯位移 自行车气门芯位移" data-y="2026"><div class="no">2026-09-13</div><div class="tt">自行车气门芯位移</div><div class="btns"><a class="b1" href="2026-09-13_自行车气门芯位移_动画演示.html">动画演示</a><a class="b2" href="2026-09-13_自行车气门芯位移_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-09-13_铁环滚动三圈半 铁环滚动三圈半" data-y="2026"><div class="no">2026-09-13</div><div class="tt">铁环滚动三圈半</div><div class="btns"><a class="b1" href="2026-09-13_铁环滚动三圈半_动画演示.html">动画演示</a><a class="b2" href="2026-09-13_铁环滚动三圈半_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-09-14_配速法摆线 配速法摆线" data-y="2026"><div class="no">2026-09-14</div><div class="tt">配速法摆线</div><div class="btns"><a class="b2" href="2026-09-14_配速法摆线_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-09-22_位移传感器测小车速度 位移传感器测小车速度" data-y="2026"><div class="no">2026-09-22</div><div class="tt">位移传感器测小车速度</div><div class="btns"><a class="b1" href="2026-09-22_位移传感器测小车速度_动画演示.html">动画演示</a><a class="b2" href="2026-09-22_位移传感器测小车速度_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-09-29_超声波测车速 超声波测车速" data-y="2026"><div class="no">2026-09-29</div><div class="tt">超声波测车速</div><div class="btns"><a class="b1" href="2026-09-29_超声波测车速_动画演示.html">动画演示</a><a class="b2" href="2026-09-29_超声波测车速_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-12_速度选择器三区域复合场 速度选择器三区域复合场" data-y="2026"><div class="no">2026-10-12</div><div class="tt">速度选择器三区域复合场</div><div class="btns"><a class="b1" href="2026-10-12_速度选择器三区域复合场_动画演示.html">动画演示</a><a class="b2" href="2026-10-12_速度选择器三区域复合场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-13_河北2021栅板粒子靶 河北2021栅板粒子靶" data-y="2026"><div class="no">2026-10-13</div><div class="tt">河北2021栅板粒子靶</div><div class="btns"><a class="b1" href="2026-10-13_河北2021栅板粒子靶_动画演示.html">动画演示</a><a class="b2" href="2026-10-13_河北2021栅板粒子靶_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-13_电场重力分区磁场复合场 电场重力分区磁场复合场" data-y="2026"><div class="no">2026-10-13</div><div class="tt">电场重力分区磁场复合场</div><div class="btns"><a class="b2" href="2026-10-13_电场重力分区磁场复合场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-14_河北2026交替场复合场 河北2026交替场复合场" data-y="2026"><div class="no">2026-10-14</div><div class="tt">河北2026交替场复合场</div><div class="btns"><a class="b1" href="2026-10-14_河北2026交替场复合场_动画演示.html">动画演示</a><a class="b2" href="2026-10-14_河北2026交替场复合场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-15_1980全国17_速度选择器质谱仪 1980全国17 速度选择器质谱仪" data-y="2026"><div class="no">2026-10-15</div><div class="tt">1980全国17 速度选择器质谱仪</div><div class="btns"><a class="b1" href="2026-10-15_1980全国17_速度选择器质谱仪_动画演示.html">动画演示</a><a class="b2" href="2026-10-15_1980全国17_速度选择器质谱仪_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-15_1998全国23_磁场半圆电场往返 1998全国23 磁场半圆电场往返" data-y="2026"><div class="no">2026-10-15</div><div class="tt">1998全国23 磁场半圆电场往返</div><div class="btns"><a class="b1" href="2026-10-15_1998全国23_磁场半圆电场往返_动画演示.html">动画演示</a><a class="b2" href="2026-10-15_1998全国23_磁场半圆电场往返_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-15_2000旧课程21_圆筒四狭缝回旋 2000旧课程21 圆筒四狭缝回旋" data-y="2026"><div class="no">2026-10-15</div><div class="tt">2000旧课程21 圆筒四狭缝回旋</div><div class="btns"><a class="b1" href="2026-10-15_2000旧课程21_圆筒四狭缝回旋_动画演示.html">动画演示</a><a class="b2" href="2026-10-15_2000旧课程21_圆筒四狭缝回旋_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-15_木板圆弧斜抛炸裂 木板圆弧斜抛炸裂" data-y="2026"><div class="no">2026-10-15</div><div class="tt">木板圆弧斜抛炸裂</div><div class="btns"><a class="b1" href="2026-10-15_木板圆弧斜抛炸裂_动画演示.html">动画演示</a><a class="b2" href="2026-10-15_木板圆弧斜抛炸裂_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-16_2004全国iv24_圆形磁场区域 2004全国iv24 圆形磁场区域" data-y="2026"><div class="no">2026-10-16</div><div class="tt">2004全国IV24 圆形磁场区域</div><div class="btns"><a class="b1" href="2026-10-16_2004全国IV24_圆形磁场区域_动画演示.html">动画演示</a><a class="b2" href="2026-10-16_2004全国IV24_圆形磁场区域_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-16_2006全国ii25_双磁场回旋过原点 2006全国ii25 双磁场回旋过原点" data-y="2026"><div class="no">2026-10-16</div><div class="tt">2006全国II25 双磁场回旋过原点</div><div class="btns"><a class="b1" href="2026-10-16_2006全国II25_双磁场回旋过原点_动画演示.html">动画演示</a><a class="b2" href="2026-10-16_2006全国II25_双磁场回旋过原点_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-18_2007全国i25_分区反向磁场 2007全国i25 分区反向磁场" data-y="2026"><div class="no">2026-10-18</div><div class="tt">2007全国I25 分区反向磁场</div><div class="btns"><a class="b1" href="2026-10-18_2007全国I25_分区反向磁场_动画演示.html">动画演示</a><a class="b2" href="2026-10-18_2007全国I25_分区反向磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-18_竖直上抛 竖直上抛" data-y="2026"><div class="no">2026-10-18</div><div class="tt">竖直上抛</div><div class="btns"><a class="b1" href="2026-10-18_竖直上抛_动画演示.html">动画演示</a><a class="b2" href="2026-10-18_竖直上抛_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-21_2009上海24_导轨磁场棒_vx图线 2009上海24 导轨磁场棒_vx图线" data-y="2026"><div class="no">2026-10-21</div><div class="tt">2009上海24 导轨磁场棒_vx图线</div><div class="btns"><a class="b1" href="2026-10-21_2009上海24_导轨磁场棒_vx图线_动画演示.html">动画演示</a><a class="b2" href="2026-10-21_2009上海24_导轨磁场棒_vx图线_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-23_2009山东25_平行板电场磁场带电粒子 2009山东25 平行板电场磁场带电粒子" data-y="2026"><div class="no">2026-10-23</div><div class="tt">2009山东25 平行板电场磁场带电粒子</div><div class="btns"><a class="b1" href="2026-10-23_2009山东25_平行板电场磁场带电粒子_动画演示.html">动画演示</a><a class="b2" href="2026-10-23_2009山东25_平行板电场磁场带电粒子_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-26_2009全国ⅰ26_磁场挡板反弹 2009全国ⅰ26 磁场挡板反弹" data-y="2026"><div class="no">2026-10-26</div><div class="tt">2009全国Ⅰ26 磁场挡板反弹</div><div class="btns"><a class="b1" href="2026-10-26_2009全国Ⅰ26_磁场挡板反弹_动画演示.html">动画演示</a><a class="b2" href="2026-10-26_2009全国Ⅰ26_磁场挡板反弹_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-26_2009全国ⅱ25_磁场圆弧电场偏转 2009全国ⅱ25 磁场圆弧电场偏转" data-y="2026"><div class="no">2026-10-26</div><div class="tt">2009全国Ⅱ25 磁场圆弧电场偏转</div><div class="btns"><a class="b1" href="2026-10-26_2009全国Ⅱ25_磁场圆弧电场偏转_动画演示.html">动画演示</a><a class="b2" href="2026-10-26_2009全国Ⅱ25_磁场圆弧电场偏转_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-27_2009海南16_正方形电子磁场 2009海南16 正方形电子磁场" data-y="2026"><div class="no">2026-10-27</div><div class="tt">2009海南16 正方形电子磁场</div><div class="btns"><a class="b1" href="2026-10-27_2009海南16_正方形电子磁场_动画演示.html">动画演示</a><a class="b2" href="2026-10-27_2009海南16_正方形电子磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-29_2010新课标25_磁场区多角度发射 2010新课标25 磁场区多角度发射" data-y="2026"><div class="no">2026-10-29</div><div class="tt">2010新课标25 磁场区多角度发射</div><div class="btns"><a class="b1" href="2026-10-29_2010新课标25_磁场区多角度发射_动画演示.html">动画演示</a><a class="b2" href="2026-10-29_2010新课标25_磁场区多角度发射_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-10-30_2010全国ⅰ26_磁场区内多方向发射 2010全国ⅰ26 磁场区内多方向发射" data-y="2026"><div class="no">2026-10-30</div><div class="tt">2010全国Ⅰ26 磁场区内多方向发射</div><div class="btns"><a class="b1" href="2026-10-30_2010全国Ⅰ26_磁场区内多方向发射_动画演示.html">动画演示</a><a class="b2" href="2026-10-30_2010全国Ⅰ26_磁场区内多方向发射_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026-11-03_2018江苏15_四矩形匀强磁场 2018江苏15 四矩形匀强磁场" data-y="2026"><div class="no">2026-11-03</div><div class="tt">2018江苏15 四矩形匀强磁场</div><div class="btns"><a class="b1" href="2026-11-03_2018江苏15_四矩形匀强磁场_动画演示.html">动画演示</a><a class="b2" href="2026-11-03_2018江苏15_四矩形匀强磁场_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026山东17_圆筒旋转叶片 圆筒旋转叶片" data-y="2026"><div class="no">2026山东17</div><div class="tt">圆筒旋转叶片</div><div class="btns"><a class="b1" href="2026山东17_圆筒旋转叶片_动画演示.html">动画演示</a><a class="b2" href="2026山东17_圆筒旋转叶片_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026山东18_速度选择器与交替半圆漂移 速度选择器与交替半圆漂移" data-y="2026"><div class="no">2026山东18</div><div class="tt">速度选择器与交替半圆漂移</div><div class="btns"><a class="b1" href="2026山东18_速度选择器与交替半圆漂移_动画演示.html">动画演示</a><a class="b2" href="2026山东18_速度选择器与交替半圆漂移_教学动画.html">教学动画</a></div></div>
+<div class="card" data-k="2026江苏16_双弹簧三球 双弹簧三球" data-y="2026"><div class="no">2026江苏16</div><div class="tt">双弹簧三球</div><div class="btns"><a class="b1" href="2026江苏16_双弹簧三球_动画演示.html">动画演示</a><a class="b2" href="2026江苏16_双弹簧三球_教学动画.html">教学动画</a></div></div>
+</div>
+<div class="empty" id="empty">没有匹配的试题</div>
+</div></main>
+<footer>物理动画教学资源 · 2026-11-12 更新</footer>
+<script>
+var q=document.getElementById('q'),cards=[].slice.call(document.querySelectorAll('.card')),
+empty=document.getElementById('empty'),curY='all';
+function apply(){
+  var k=q.value.trim().toLowerCase(),n=0;
+  cards.forEach(function(c){
+    var okY=(curY==='all'||c.dataset.y===curY);
+    var okK=!k||c.dataset.k.indexOf(k)>-1;
+    var show=okY&&okK;
+    c.style.display=show?'':'none';
+    if(show)n++;
+  });
+  empty.style.display=n?'none':'block';
+}
+q.addEventListener('input',apply);
+[].slice.call(document.querySelectorAll('.yb')).forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.yb').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');curY=b.dataset.y;apply();
+  });
+});
+</script>
+</body></html>
